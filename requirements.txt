@@ -1,6 +1,1 @@
-The main program requires the following pip-installable libraries:
-
-csv (standard library, no need to install)
-re (standard library, no need to install)
-Since both "csv" and "re" are part of Python's standard library, there's no need to install any additional libraries for the provided code to work.
-
+streamlit>=1.28.0
