@@ -33,7 +33,7 @@ The Streamlit app (`cncapp.py`) adds several user-friendly features:
 ### 📚 Data Sources
 
 **Main Source:** [The Colors Meaning](https://thecolorsmeaning.com/)
-**Other sources:** [ColorXS](https://www.colorxs.com/), [ColorHexa](https://www.colorhexa.com/), [Color-Name](https://color-name.com/), [Vista Create](https://create.vista.com/), [HexColor](https://hexcolor.co/), [ArtyClick](https://colors.artyclick.com/), [Color Designer](https://colordesigner.io/), [suspicious link removed]
+**Other sources:** [ColorXS](https://www.colorxs.com/), [ColorHexa](https://www.colorhexa.com/), [Color-Name](https://color-name.com/), [Vista Create](https://create.vista.com/), [HexColor](https://hexcolor.co/), [ArtyClick](https://colors.artyclick.com/), [Color Designer](https://colordesigner.io/)
 
 -----
 
