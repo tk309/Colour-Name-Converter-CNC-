@@ -157,11 +157,6 @@ with tab2:
 with st.sidebar:
     st.header("ℹ️ ABOUT")
     st.markdown("""
-    <div class="info-box">
-    This app converts between <strong>color names</strong> and <strong>hexadecimal codes</strong> using a database of over 1000 colors.
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("""
     This app converts between **color names** and **hexadecimal codes** using a database of over 1000 colors.
     
     **Features:**
