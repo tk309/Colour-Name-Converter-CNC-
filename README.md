@@ -1,6 +1,6 @@
 # 🎨 Color Name Converter (CNC)
 
-> A two-way versatile Python tool and Web Application that translates hex codes into color names and seamlessly converts color names back into hex codes, using a comprehensive CSV database.
+> A Python tool and Web Application that converts standard hex codes into color names vice versa, using a comprehensive CSV database.
 
 📹 **Video Demo:** [Watch on YouTube](https://www.youtube.com/shorts/0B-R-BhlIv0)
 
