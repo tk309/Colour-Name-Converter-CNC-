@@ -25,7 +25,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .result-box {
-        background-color: #E072A4;
+        background-color: #BF5700;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
