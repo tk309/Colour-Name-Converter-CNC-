@@ -25,7 +25,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .result-box {
-        background-color: #aeaa86;
+        background-color: #8D818C;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
@@ -48,8 +48,8 @@ st.markdown("""
         margin: 1rem 0;
     }
     .info-box {
-        background-color: #E8F4FD;
-        border-left: 4px solid #2196F3;
+        background-color: #2196F3;
+        border-left: 4px solid #E8F4FD;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 0.9rem;
