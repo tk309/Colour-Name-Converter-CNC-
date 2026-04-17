@@ -25,7 +25,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .result-box {
-        background-color: #f0f2f6;
+        background-color: #2196f3;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
@@ -38,6 +38,22 @@ st.markdown("""
         border-radius: 10px;
         margin: 1rem 0;
         border: 1px solid #ddd;
+    }
+    .disclaimer {
+        background-color: #FFF3CD;
+        border-left: 4px solid #FFC107;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+    }
+    .info-box {
+        background-color: #E8F4FD;
+        border-left: 4px solid #2196F3;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin: 1rem 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -88,6 +104,14 @@ if not colors_dict:
 st.markdown('<h1 class="main-header">🎨 Color Name Converter</h1>', unsafe_allow_html=True)
 st.markdown("Convert between color names and their hexadecimal codes.")
 
+# === DISCLAIMER (subtle but noticeable) ===
+st.markdown("""
+<div class="disclaimer">
+📌 <strong>Note:</strong> This database contains over 1000 color names and hex codes, but it is not exhaustive. 
+If you search for a color name or hex code that isn't in our list, you'll see a "not found" message — this is expected and not an error.
+</div>
+""", unsafe_allow_html=True)
+
 # Create two tabs for different input methods
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
@@ -105,7 +129,7 @@ with tab1:
                 st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
                 st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
             else:
-                st.error(f"❌ Color name '{color_name}' not found in database.")
+                st.error(f"❌ Color name '{color_name}' not found in database. Try another name (database covers many but not all colors).")
         else:
             st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
 
@@ -126,11 +150,11 @@ with tab2:
                 st.markdown(f'<div class="color-preview" style="background-color: {hex_input};"></div>', unsafe_allow_html=True)
                 st.caption(f"RGB: {tuple(int(hex_input.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
             else:
-                st.error(f"❌ Hex code {hex_input} not found in database.")
+                st.error(f"❌ Hex code {hex_input} not found in database. Try another code (database covers many but not all hex codes).")
         else:
             st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits (0-9, A-F).")
 
-# Sidebar with info
+# Sidebar with additional info
 with st.sidebar:
     st.header("ℹ️ About")
     st.markdown("""
@@ -146,9 +170,14 @@ with st.sidebar:
     - `Red` → `#FF0000`
     - `#FFFFFF` → `White`
     - `#E32636` → `Alizarin Crimson`
-    
-    **Data source:** Combined from various color databases.
     """)
+    
+    # Repeat disclaimer in sidebar for emphasis
+    st.markdown("""
+    <div class="info-box">
+    📚 <strong>Database coverage:</strong> This tool includes over 1000 common colors, but it is not a complete dictionary of all existing color names or hex codes. If your search returns "not found", it simply means that exact color is not in our list — not that the app is broken.
+    </div>
+    """, unsafe_allow_html=True)
     
     st.header("📁 Files Required")
     st.markdown("Make sure `colors.csv` is in the same directory as this app.")
