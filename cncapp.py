@@ -40,7 +40,7 @@ st.markdown("""
         border: 1px solid #ddd;
     }
     .disclaimer {
-        background-color: #FFF3CD;
+        background-color: #FF7F50;
         border-left: 4px solid #FFC107;
         padding: 0.75rem;
         border-radius: 8px;
