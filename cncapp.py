@@ -41,7 +41,7 @@ st.markdown("""
     }
     .disclaimer {
         background-color: #FF7F50;
-        border-left: 4px solid #FFC107;
+        border-left: 4px solid #FCEFEF;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 0.9rem;
