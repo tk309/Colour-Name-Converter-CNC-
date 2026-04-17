@@ -47,7 +47,7 @@ The project consists of the following files:
   * `test_project.py`: The test suite for verifying the logic.
   * `requirements.txt`: List of dependencies (Streamlit).
 
-### 🚀 How to Run
+### 🚀 Usage
 
 **For the Terminal version:**
 
