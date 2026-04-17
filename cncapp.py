@@ -107,8 +107,7 @@ st.markdown("Convert between color names and their hexadecimal codes.")
 # === DISCLAIMER (subtle but noticeable) ===
 st.markdown("""
 <div class="disclaimer">
-📌 <strong>Note:</strong> This database contains over 1000 color names and hex codes, but it is not exhaustive. 
-If you search for a color name or hex code that isn't in our list, you'll see a "not found" message — this is expected and not an error.
+📌 <strong>NOTE:</strong> This tool uses a limited color database. Some color names or hex codes may not be available.
 </div>
 """, unsafe_allow_html=True)
 
@@ -117,7 +116,7 @@ tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color N
 
 with tab1:
     st.subheader("Enter a color name")
-    color_name = st.text_input("Color name:", placeholder="e.g., Red, Midnight Blue, Crimson")
+    color_name = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson")
     
     if color_name:
         color_name = color_name.strip()
@@ -135,7 +134,7 @@ with tab1:
 
 with tab2:
     st.subheader("Enter a hex color code")
-    hex_input = st.text_input("Hex code:", placeholder="e.g., #FF0000, #FFFFFF, #663399")
+    hex_input = st.text_input("Hex Code:", placeholder="e.g., #FF0000, #FFFFFF, #663399")
     
     if hex_input:
         hex_input = hex_input.strip().upper()
@@ -156,7 +155,12 @@ with tab2:
 
 # Sidebar with additional info
 with st.sidebar:
-    st.header("ℹ️ About")
+    st.header("ℹ️ ABOUT")
+    st.markdown("""
+    <div class="info-box">
+    📚 <strong>Data source:</strong>This app converts between **color names** and **hexadecimal codes** using a database of over 1000 colors.
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("""
     This app converts between **color names** and **hexadecimal codes** using a database of over 1000 colors.
     
@@ -175,12 +179,9 @@ with st.sidebar:
     # Repeat disclaimer in sidebar for emphasis
     st.markdown("""
     <div class="info-box">
-    📚 <strong>Database coverage:</strong> This tool includes over 1000 common colors, but it is not a complete dictionary of all existing color names or hex codes. If your search returns "not found", it simply means that exact color is not in our list — not that the app is broken.
+    📚 <strong>Data source:</strong>Combined from various color databases.
     </div>
     """, unsafe_allow_html=True)
-    
-    st.header("📁 Files Required")
-    st.markdown("Make sure `colors.csv` is in the same directory as this app.")
     
     # Optional: show a few random colors
     if colors_dict:
