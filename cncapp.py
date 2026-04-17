@@ -49,7 +49,7 @@ st.markdown("""
     }
     .info-box {
         background-color: #FF8000;
-        border-left: 4px solid #E8F4FD;
+        border-left: 4px solid #FFF9C4;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 0.9rem;
