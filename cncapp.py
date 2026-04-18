@@ -54,7 +54,7 @@ st.markdown("""
         margin: 1rem 0;
     }
     div.stButton > button {
-        background-color: #FF4B4B;
+        background-color: #E04343;
         color: white;
         font-weight: bold;
         border-radius: 8px;
