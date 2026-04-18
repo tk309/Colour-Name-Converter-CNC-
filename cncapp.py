@@ -8,14 +8,12 @@ import csv
 import re
 from pathlib import Path
 
-# Set page config
 st.set_page_config(
     page_title="Color Name Converter",
     page_icon="🎨",
     layout="centered"
 )
 
-# Custom CSS
 st.markdown("""
 <style>
     .main-header {
@@ -55,17 +53,15 @@ st.markdown("""
         font-size: 0.9rem;
         margin: 1rem 0;
     }
-    /* Convert button style */
     div.stButton > button {
         background-color: #FF4B4B;
         color: white;
         font-weight: bold;
         border-radius: 8px;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 2rem;
         width: 100%;
-        font-size: 1.5rem;
+        font-size: 1rem;
         border: none;
-        margin-top: 0.5rem;
     }
     div.stButton > button:hover {
         background-color: #E04343;
@@ -74,7 +70,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# JavaScript to hide keyboard on button click (works on mobile)
+# JavaScript to hide keyboard on button click (mobile)
 st.markdown("""
 <script>
 function blurActiveElement() {
@@ -136,53 +132,56 @@ tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color N
 # ========= TAB 1: Color Name to Hex =========
 with tab1:
     st.subheader("Enter a color name")
-    color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
-    col1, col2, col3 = st.columns([1, 2, 1])  # Center the button
-    with col2:
-        convert_name_btn = st.button("Convert", key="convert_name_btn")
-    
-    if convert_name_btn:
-        if color_name_input:
-            color_name = color_name_input.strip()
-            if validate_name(color_name):
-                hex_code = convert_name(color_name, colors_dict)
-                if hex_code:
-                    st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
-                    st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
+    with st.form(key="name_form"):
+        color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
+        # Center the button using columns
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_name = st.form_submit_button("Convert")
+        
+        if submitted_name:
+            if color_name_input:
+                color_name = color_name_input.strip()
+                if validate_name(color_name):
+                    hex_code = convert_name(color_name, colors_dict)
+                    if hex_code:
+                        st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
+                    else:
+                        st.error(f"❌ Color name '{color_name}' not found in database.")
                 else:
-                    st.error(f"❌ Color name '{color_name}' not found in database.")
+                    st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
             else:
-                st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
-        else:
-            st.warning("Please enter a color name.")
+                st.warning("Please enter a color name.")
 
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
     st.subheader("Enter a hex color code")
-    hex_input_raw = st.text_input("Hex Code:", placeholder="e.g., #FF0000, #FFFFFF", key="hex_input")
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        convert_hex_btn = st.button("Convert", key="convert_hex_btn")
-    
-    if convert_hex_btn:
-        if hex_input_raw:
-            hex_input = hex_input_raw.strip().upper()
-            if validate_code(hex_input):
-                names = convert_code(hex_input, colors_dict)
-                if names:
-                    if len(names) == 1:
-                        st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{names[0]}</strong></div>', unsafe_allow_html=True)
+    with st.form(key="hex_form"):
+        hex_input_raw = st.text_input("Hex Code:", placeholder="e.g., #FF0000, #FFFFFF", key="hex_input")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_hex = st.form_submit_button("Convert")
+        
+        if submitted_hex:
+            if hex_input_raw:
+                hex_input = hex_input_raw.strip().upper()
+                if validate_code(hex_input):
+                    names = convert_code(hex_input, colors_dict)
+                    if names:
+                        if len(names) == 1:
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{names[0]}</strong></div>', unsafe_allow_html=True)
+                        else:
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{", ".join(names)}</strong><br><small>(Multiple names)</small></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_input};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_input.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
                     else:
-                        st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{", ".join(names)}</strong><br><small>(Multiple names)</small></div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="color-preview" style="background-color: {hex_input};"></div>', unsafe_allow_html=True)
-                    st.caption(f"RGB: {tuple(int(hex_input.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
+                        st.error(f"❌ Hex code {hex_input} not found in database.")
                 else:
-                    st.error(f"❌ Hex code {hex_input} not found in database.")
+                    st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits.")
             else:
-                st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits.")
-        else:
-            st.warning("Please enter a hex code.")
+                st.warning("Please enter a hex code.")
 
 # Sidebar
 with st.sidebar:
