@@ -23,7 +23,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .result-box {
-        background-color: #BF5700;
+        background-color: #40E0D0;
         padding: 1rem;
         border-radius: 10px;
         margin: 1rem 0;
@@ -38,7 +38,7 @@ st.markdown("""
         border: 1px solid #ddd;
     }
     .disclaimer {
-        background-color: #FF7F50;
+        background-color: #40E0D0;
         border-left: 4px solid #FCEFEF;
         padding: 0.75rem;
         border-radius: 8px;
@@ -46,7 +46,7 @@ st.markdown("""
         margin: 1rem 0;
     }
     .info-box {
-        background-color: #FF8000;
+        background-color: #40E0D0;
         border-left: 4px solid #FFF9C4;
         padding: 0.75rem;
         border-radius: 8px;
@@ -54,7 +54,7 @@ st.markdown("""
         margin: 1rem 0;
     }
     div.stButton > button {
-        background-color: #FF4B4B;
+        background-color: #40E0D0;
         color: white;
         font-weight: bold;
         border-radius: 8px;
