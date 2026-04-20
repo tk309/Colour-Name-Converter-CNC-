@@ -329,32 +329,29 @@ with tab1:
         with col2:
             submitted_name = st.form_submit_button("Convert")
 
+        with st.form(key="name_form"):
+        color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
+        # Center the button using columns
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_name = st.form_submit_button("Convert")
+        
         if submitted_name:
             if color_name_input:
                 color_name = color_name_input.strip()
                 if validate_name(color_name):
-                    results = search_color_names(color_name, colors_dict, max_results=8)
-                    if results:
-                        exact_hits = [r for r in results if r[2] == "exact"]
-                        if not exact_hits:
-                            st.markdown(
-                                f'<div class="no-exact-banner">⚠️ No exact match for "<strong>{color_name}</strong>". '
-                                f'Showing {len(results)} related result(s):</div>',
-                                unsafe_allow_html=True
-                            )
-                        else:
-                            st.markdown(
-                                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{color_name}</strong>"</div>',
-                                unsafe_allow_html=True
-                            )
-                        render_result_cards(results)
+                    hex_code = convert_name(color_name, colors_dict)
+                    if hex_code:
+                        st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
                     else:
                         st.error(f"❌ Color name '{color_name}' not found in database.")
                 else:
                     st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
             else:
                 st.warning("Please enter a color name.")
-
+                
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
     st.subheader("Enter a hex color code")
