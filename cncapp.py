@@ -285,21 +285,34 @@ st.markdown("""
 
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
-# ========= TAB 1: Color Name to Hex (Pure Streamlit) =========
+# ========= TAB 1: Color Name to Hex (True Dropdown) =========
 with tab1:
     st.subheader("Enter a color name")
     
-    # Single text input - the only widget the user interacts with
+    # Initialize session state for dropdown visibility
+    if "show_dropdown" not in st.session_state:
+        st.session_state.show_dropdown = False
+    if "typed_prefix" not in st.session_state:
+        st.session_state.typed_prefix = ""
+    
+    # Single text input - user types here
     user_input = st.text_input(
         "Type a color name:",
         placeholder="e.g., R, Re, Red, Bla, Black...",
-        key="color_search_input",
-        help="Start typing - only colors beginning with your letters will appear"
+        key="color_input",
+        on_change=lambda: st.session_state.update({"show_dropdown": True, "typed_prefix": st.session_state.color_input})
     )
     
-    # Only show dropdown if user has typed something
+    # Update session state when typing
     if user_input and user_input.strip():
-        query = user_input.strip().lower()
+        st.session_state.typed_prefix = user_input.strip().lower()
+        st.session_state.show_dropdown = True
+    else:
+        st.session_state.show_dropdown = False
+    
+    # Show dropdown ONLY if user has typed something
+    if st.session_state.show_dropdown and st.session_state.typed_prefix:
+        query = st.session_state.typed_prefix
         
         # Filter colors that START WITH the query
         matching_colors = [
@@ -308,34 +321,38 @@ with tab1:
         ]
         
         if matching_colors:
-            # Create a container that LOOKS like a dropdown
-            with st.container():
-                st.markdown("---")
-                st.caption(f"📋 Select from {len(matching_colors)} color(s) starting with '{query}':")
-                
-                # Use radio buttons styled to look like a dropdown list
-                selected_name = st.radio(
-                    label="",
-                    options=matching_colors[:20],  # Limit to 20 for better UX
-                    key="color_radio",
-                    label_visibility="collapsed"
+            # Create a placeholder for the dropdown
+            dropdown_placeholder = st.empty()
+            
+            with dropdown_placeholder.container():
+                selected_name = st.selectbox(
+                    f"📋 Select a color (showing {len(matching_colors)} color(s) starting with '{query}'):",
+                    options=[""] + matching_colors,  # Empty option as default
+                    key="color_dropdown",
+                    label_visibility="visible"
                 )
                 
-                # Add a note if there are more results
-                if len(matching_colors) > 20:
-                    st.caption(f"✨ Showing first 20 of {len(matching_colors)} matches. Type more letters to narrow further.")
-                
-                # When selected, show the results
-                if selected_name:
-                    st.markdown("---")
+                # When user selects a color (not the empty option)
+                if selected_name and selected_name != "":
+                    # Show results
                     results = search_color_names(selected_name, colors_dict, max_results=8)
                     if results:
+                        st.markdown(
+                            f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
+                            unsafe_allow_html=True
+                        )
                         render_result_cards(results)
+                    
+                    # Optional: Clear the dropdown after selection
+                    # st.session_state.show_dropdown = False
+                    # st.rerun()
         else:
             st.info(f"😕 No color names start with '{query}'. Try a different letter.")
     else:
-        st.caption("⌨️ Start typing a letter (e.g., 'R' for Red, 'B' for Blue) to see matching colors.")
-    
+        # Show hint when no input
+        st.caption("⌨️ Start typing a letter (e.g., 'R', 'B', 'G') to see matching colors in the dropdown.")
+
+
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
     st.subheader("Enter a hex color code")
