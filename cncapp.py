@@ -276,25 +276,6 @@ with tab1:
         key="name_select"
     )
 
-    if selected_name:
-        results = search_color_names(selected_name, colors_dict, max_results=3)
-        if results:
-            st.markdown(
-                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
-                unsafe_allow_html=True
-            )
-            render_result_cards(results)
-        else:
-            st.error(f"❌ No colors found matching '{selected_name}'.")
-
-   
-    with st.form(key="name_form"):
-        color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
-        # Center the button using columns
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            submitted_name = st.form_submit_button("Convert")
-        
         if submitted_name:
             if color_name_input:
                 color_name = color_name_input.strip()
@@ -310,6 +291,14 @@ with tab1:
                     st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
             else:
                 st.warning("Please enter a color name.")
+   
+    with st.form(key="name_form"):
+        color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
+        # Center the button using columns
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_name = st.form_submit_button("Convert")
+        
 
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
