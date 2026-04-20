@@ -162,16 +162,29 @@ def convert_name(name, colors_dict):
 # ── SEARCH ENGINE HELPERS ────────────────────────────────────────────────────
 
 def hex_to_rgb(hex_code):
-    """Convert a hex code string to an (R, G, B) tuple."""
-    h = hex_code.lstrip("#")
-    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+    """Convert a hex code string to an (R, G, B) tuple. Returns None if invalid."""
+    if not isinstance(hex_code, str):
+        return None
+    hex_code = hex_code.strip()
+    if not hex_code.startswith("#") or len(hex_code) != 7:
+        return None
+    try:
+        h = hex_code.lstrip("#")
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+    except ValueError:
+        return None
 
 def color_distance(hex1, hex2):
-    """Euclidean distance between two hex colors in RGB space."""
-    r1, g1, b1 = hex_to_rgb(hex1)
-    r2, g2, b2 = hex_to_rgb(hex2)
+    """Euclidean distance between two hex colors in RGB space.
+    Returns a very large number if either hex code is invalid."""
+    rgb1 = hex_to_rgb(hex1)
+    rgb2 = hex_to_rgb(hex2)
+    if rgb1 is None or rgb2 is None:
+        return float('inf')   # push invalid colors to the end of sorted list
+    r1, g1, b1 = rgb1
+    r2, g2, b2 = rgb2
     return ((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2) ** 0.5
-
+    
 def search_color_names(query, colors_dict, max_results=8):
     """
     Search engine for color names.
@@ -207,37 +220,47 @@ def search_hex_codes(query, colors_dict, max_results=8):
     Priority: exact match → prefix match → closest by RGB distance.
     Returns a list of (name, hex_code, match_type) tuples.
     """
+    if not query or len(query.strip()) == 0:
+        return []
+        
     q = query.strip().upper()
     if q and not q.startswith("#"):
         q = "#" + q
 
+    results = []
+
     if not q or q == "#":
         return []
-
-    # Exact match
-    exact_names = convert_code(q, colors_dict)
-    if exact_names:
-        return [(n, q, "exact") for n in exact_names]
-
-    # Prefix search — user is still typing (e.g. "#FF4")
-    prefix_results = [
-        (name, code, "prefix")
-        for name, code in colors_dict.items()
-        if code.upper().startswith(q)
-    ]
-    prefix_results.sort(key=lambda x: x[1])
-    if prefix_results:
-        return prefix_results[:max_results]
-
-    # Closest colors by RGB distance — only for full valid hex codes
-    if validate_code(q):
+        
+    # 1. Prefix matches (user is typing partial hex)
+    prefix_matches = []
+    for name, code in colors_dict.items():
+        code_upper = code.upper()
+        if code_upper.startswith(q):
+            prefix_matches.append((name, code))
+    
+    prefix_matches.sort(key=lambda x: x[1])
+    for name, code in prefix_matches[:max_results]:
+        results.append(f"{code} - {name}")
+    
+    # 2. If user typed a full valid hex, add closest matches
+    if len(q) == 7 and validate_code(q):
+        # Filter to only valid color codes
+        valid_items = [
+            (name, code) for name, code in colors_dict.items()
+            if validate_code(code)
+        ]
         scored = sorted(
-            colors_dict.items(),
+            valid_items,
             key=lambda item: color_distance(q, item[1])
         )
-        return [(name, code, "closest") for name, code in scored[:max_results]]
+        for name, code in scored[:max_results]:
+            formatted = f"{code} - {name}"
+            if formatted not in results:
+                results.append(formatted)
+    
+    return results[:max_results]
 
-    return []
 
 def render_result_cards(results):
     """Render search-engine-style result cards with swatch, name, hex, RGB, and match badge."""
