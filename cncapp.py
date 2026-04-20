@@ -276,21 +276,21 @@ with tab1:
         key="name_select"
     )
 
-        if submitted_name:
-            if color_name_input:
-                color_name = color_name_input.strip()
-                if validate_name(color_name):
-                    hex_code = convert_name(color_name, colors_dict)
-                    if hex_code:
-                        st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
-                        st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
-                        st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
-                    else:
-                        st.error(f"❌ Color name '{color_name}' not found in database.")
+    if submitted_name:
+        if color_name_input:
+            color_name = color_name_input.strip()
+            if validate_name(color_name):
+                hex_code = convert_name(color_name, colors_dict)
+                if hex_code:
+                    st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
+                    st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
                 else:
-                    st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
+                    st.error(f"❌ Color name '{color_name}' not found in database.")
             else:
-                st.warning("Please enter a color name.")
+                st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
+        else:
+            st.warning("Please enter a color name.")
    
     with st.form(key="name_form"):
         color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
