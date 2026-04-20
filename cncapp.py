@@ -285,38 +285,56 @@ st.markdown("""
 
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
-# ========= TAB 1: Color Name to Hex (single autocomplete widget) =========
+# ========= TAB 1: Color Name to Hex (Pure Streamlit) =========
 with tab1:
     st.subheader("Enter a color name")
-
-    # Single autocomplete widget – dropdown appears only after typing
-    selected_name = st_autocomplete(
-        options=sorted(colors_dict.keys()),          # all color names, sorted
-        placeholder="Type a letter (e.g., R, B, G)...",
-        key="color_autocomplete",
-        case_sensitive=False,
-        # Filter function: only show names that START with the typed query
-        filter_func=lambda name, query: name.lower().startswith(query.lower()) if query else False,
-        # Do not show any options when query is empty
-        empty_option=None,
-        # Limit how many suggestions appear
-        max_items=50
+    
+    # Single text input - the only widget the user interacts with
+    user_input = st.text_input(
+        "Type a color name:",
+        placeholder="e.g., R, Re, Red, Bla, Black...",
+        key="color_search_input",
+        help="Start typing - only colors beginning with your letters will appear"
     )
-
-    # When a name is selected (or typed and chosen)
-    if selected_name:
-        # Use the existing search engine to show result cards
-        results = search_color_names(selected_name, colors_dict, max_results=8)
-        if results:
-            st.markdown(
-                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
-                unsafe_allow_html=True
-            )
-            render_result_cards(results)
+    
+    # Only show dropdown if user has typed something
+    if user_input and user_input.strip():
+        query = user_input.strip().lower()
+        
+        # Filter colors that START WITH the query
+        matching_colors = [
+            name for name in sorted(colors_dict.keys())
+            if name.lower().startswith(query)
+        ]
+        
+        if matching_colors:
+            # Create a container that LOOKS like a dropdown
+            with st.container():
+                st.markdown("---")
+                st.caption(f"📋 Select from {len(matching_colors)} color(s) starting with '{query}':")
+                
+                # Use radio buttons styled to look like a dropdown list
+                selected_name = st.radio(
+                    label="",
+                    options=matching_colors[:20],  # Limit to 20 for better UX
+                    key="color_radio",
+                    label_visibility="collapsed"
+                )
+                
+                # Add a note if there are more results
+                if len(matching_colors) > 20:
+                    st.caption(f"✨ Showing first 20 of {len(matching_colors)} matches. Type more letters to narrow further.")
+                
+                # When selected, show the results
+                if selected_name:
+                    st.markdown("---")
+                    results = search_color_names(selected_name, colors_dict, max_results=8)
+                    if results:
+                        render_result_cards(results)
         else:
-            st.error(f"❌ No colors found matching '{selected_name}'.")
+            st.info(f"😕 No color names start with '{query}'. Try a different letter.")
     else:
-        st.info("⌨️ Start typing – only colors beginning with your letters will appear.")
+        st.caption("⌨️ Start typing a letter (e.g., 'R' for Red, 'B' for Blue) to see matching colors.")
     
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
