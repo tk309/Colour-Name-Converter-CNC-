@@ -1,16 +1,15 @@
 # Project: Color Name Converter (CNC)
 # Author: Timothy Kemiki
 # Date: 2025/2026
-# Description: A real-time live search engine for colors.
+# Description: A tool to convert hex codes to color names.
 
 import streamlit as st
 import csv
 import re
 from pathlib import Path
-from st_keyup import st_keyup  # New import for live keystroke tracking
 
 st.set_page_config(
-    page_title="Color Search Engine",
+    page_title="Color Name Converter",
     page_icon="🎨",
     layout="centered"
 )
@@ -21,12 +20,7 @@ st.markdown("""
         font-size: 2.5rem;
         text-align: center;
         color: #FF4B4B;
-        margin-bottom: 0.5rem;
-    }
-    .sub-header {
-        text-align: center;
-        color: #666;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
     .result-box {
         background-color: #BF5700;
@@ -35,7 +29,6 @@ st.markdown("""
         margin: 1rem 0;
         text-align: center;
         font-size: 1.2rem;
-        color: white;
     }
     .color-preview {
         width: 100%;
@@ -44,12 +37,6 @@ st.markdown("""
         margin: 1rem 0;
         border: 1px solid #ddd;
     }
-    .partial-match-preview {
-        height: 40px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-bottom: 15px;
-    }
     .disclaimer {
         background-color: #FF7F50;
         border-left: 4px solid #FCEFEF;
@@ -57,13 +44,46 @@ st.markdown("""
         border-radius: 8px;
         font-size: 0.9rem;
         margin: 1rem 0;
+    }
+    .info-box {
+        background-color: #FF8000;
+        border-left: 4px solid #FFF9C4;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+    }
+    div.stButton > button {
+        background-color: #FF4B4B;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        padding: 0.5rem 2rem;
+        width: 100%;
+        font-size: 1rem;
+        border: none;
+    }
+    div.stButton > button:hover {
+        background-color: #E04343;
         color: white;
     }
-    /* Hide the default st_keyup label for a cleaner look */
-    div[data-testid="stKeyup"] label {
-        display: none;
-    }
 </style>
+""", unsafe_allow_html=True)
+
+# JavaScript to hide keyboard on button click (mobile)
+st.markdown("""
+<script>
+function blurActiveElement() {
+    if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+    }
+}
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.stButton button')) {
+        setTimeout(blurActiveElement, 50);
+    }
+});
+</script>
 """, unsafe_allow_html=True)
 
 @st.cache_data
@@ -78,129 +98,119 @@ def load_colors(filename="colors.csv"):
             colors_dict[row["name"]] = row["code"]
     return colors_dict
 
-def get_rgb(hex_code):
-    """Helper to convert hex to RGB tuple."""
-    hex_clean = hex_code.lstrip('#')
-    return tuple(int(hex_clean[i:i+2], 16) for i in (0, 2, 4))
+def validate_code(code):
+    pattern = r"^#[a-fA-F0-9]{6}$"
+    return bool(re.search(pattern, code, re.IGNORECASE))
 
-def display_main_result(title, hex_code):
-    """Helper to render the main search result card."""
-    st.markdown(f'<div class="result-box">✅ {title}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
-    st.caption(f"RGB: {get_rgb(hex_code)}")
+def convert_code(code, colors_dict):
+    code = code.upper()
+    return [name for name, hex_code in colors_dict.items() if hex_code == code] or None
+
+def validate_name(name):
+    pattern = r"^[a-zA-Z\s'’]+$"
+    return bool(re.fullmatch(pattern, name, re.IGNORECASE))
+
+def convert_name(name, colors_dict):
+    name = name.title().replace("’", "'")
+    return colors_dict.get(name)
 
 colors_dict = load_colors()
 if not colors_dict:
     st.stop()
 
-# Header
-st.markdown('<h1 class="main-header">🎨 Color Search</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Start typing a name (e.g., "Crimson") or hex code (e.g., "#DC143C")</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🎨 Color Name Converter</h1>', unsafe_allow_html=True)
+st.markdown("Convert between color names and their hexadecimal codes.")
 
-# ---------------------------------------------------------
-# THE LIVE OMNI-SEARCH BAR
-# debounce=300 means it waits 300ms after the user stops typing to search (prevents lag)
-# ---------------------------------------------------------
-query = st_keyup(
-    "Search:", 
-    placeholder="Type to search colors instantly...", 
-    key="live_search", 
-    debounce=300
-)
+st.markdown("""
+<div class="disclaimer">
+📌 <strong>NOTE:</strong> This tool uses a limited color database. Some color names or hex codes may not be available.
+</div>
+""", unsafe_allow_html=True)
 
-# Live processing as the user types
-if query:
-    query_clean = query.strip()
-    
-    # 1. Check if the input looks like a hex code (with or without #)
-    if re.match(r"^#?[a-fA-F0-9]{1,6}$", query_clean) and any(char.isdigit() for char in query_clean):
-        # We treat it as hex if it matches the pattern and contains numbers 
-        # (to avoid treating names like "AABB" as hex prematurely)
-        hex_query = query_clean if query_clean.startswith('#') else f"#{query_clean}"
-        hex_query = hex_query.upper()
+tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
+
+# ========= TAB 1: Color Name to Hex =========
+with tab1:
+    st.subheader("Enter a color name")
+    with st.form(key="name_form"):
+        color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
+        # Center the button using columns
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_name = st.form_submit_button("Convert")
         
-        # Exact match
-        matching_names = [name for name, hx in colors_dict.items() if hx == hex_query]
-        
-        if matching_names:
-            title = f"<strong>{hex_query}</strong> → <strong>{', '.join(matching_names)}</strong>"
-            display_main_result(title, hex_query)
-            
-        # Live Hex Suggestions (e.g., they typed "#FF", show all starting with #FF)
-        elif len(hex_query) < 7:
-            st.markdown(f"**Suggestions starting with `{hex_query}`:**")
-            hex_suggestions = [(name, hx) for name, hx in colors_dict.items() if hx.startswith(hex_query)][:12]
-            
-            if hex_suggestions:
-                cols = st.columns(3)
-                for idx, (pm_name, pm_hex) in enumerate(hex_suggestions):
-                    with cols[idx % 3]:
-                        st.markdown(f"**{pm_name}**<br>`{pm_hex}`", unsafe_allow_html=True)
-                        st.markdown(f'<div class="partial-match-preview" style="background-color: {pm_hex};"></div>', unsafe_allow_html=True)
+        if submitted_name:
+            if color_name_input:
+                color_name = color_name_input.strip()
+                if validate_name(color_name):
+                    hex_code = convert_name(color_name, colors_dict)
+                    if hex_code:
+                        st.markdown(f'<div class="result-box">✅ <strong>{color_name.title()}</strong> → <strong>{hex_code}</strong></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_code};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_code.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
+                    else:
+                        st.error(f"❌ Color name '{color_name}' not found in database.")
+                else:
+                    st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
             else:
-                st.caption("No matching hex codes found yet.")
+                st.warning("Please enter a color name.")
 
-    # 2. Treat input as a Color Name
-    else:
-        search_term = query_clean.title().replace("’", "'")
-        search_lower = query_clean.lower()
+# ========= TAB 2: Hex to Color Name =========
+with tab2:
+    st.subheader("Enter a hex color code")
+    with st.form(key="hex_form"):
+        hex_input_raw = st.text_input("Hex Code:", placeholder="e.g., #FF0000, #FFFFFF", key="hex_input")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submitted_hex = st.form_submit_button("Convert")
         
-        # Look for an exact match first
-        exact_match_hex = colors_dict.get(search_term)
-        
-        # Look for partial matches (Live suggestions)
-        partial_matches = []
-        for name, hx in colors_dict.items():
-            if search_lower in name.lower() and name != search_term:
-                partial_matches.append((name, hx))
-        
-        # Display logic
-        if exact_match_hex:
-            title = f"<strong>{search_term}</strong> → <strong>{exact_match_hex}</strong>"
-            display_main_result(title, exact_match_hex)
-        
-        if partial_matches:
-            if exact_match_hex:
-                st.divider()
-                st.subheader("Similar colors:")
+        if submitted_hex:
+            if hex_input_raw:
+                hex_input = hex_input_raw.strip().upper()
+                if validate_code(hex_input):
+                    names = convert_code(hex_input, colors_dict)
+                    if names:
+                        if len(names) == 1:
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{names[0]}</strong></div>', unsafe_allow_html=True)
+                        else:
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{", ".join(names)}</strong><br><small>(Multiple names)</small></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_input};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_input.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
+                    else:
+                        st.error(f"❌ Hex code {hex_input} not found in database.")
+                else:
+                    st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits.")
             else:
-                st.markdown(f"**Suggestions for '{query_clean}':**")
-            
-            # Limit to 12 partial matches for clean UI
-            partial_matches = sorted(partial_matches, key=lambda x: x[0])[:12]
-            
-            # Display in a grid
-            cols = st.columns(3)
-            for idx, (pm_name, pm_hex) in enumerate(partial_matches):
-                with cols[idx % 3]:
-                    st.markdown(f"**{pm_name}**<br>`{pm_hex}`", unsafe_allow_html=True)
-                    st.markdown(f'<div class="partial-match-preview" style="background-color: {pm_hex};"></div>', unsafe_allow_html=True)
-
-        if not exact_match_hex and not partial_matches:
-            st.error(f"❌ No colors found matching '{query_clean}'.")
+                st.warning("Please enter a hex code.")
 
 # Sidebar
 with st.sidebar:
     st.header("ℹ️ ABOUT")
     st.markdown("""
-    This search engine seamlessly finds colors by their **name** or **hexadecimal code** in real-time.
+    This app converts between **color names** and **hexadecimal codes** using a database of over 1000 colors.
     
-    **Try typing:**
-    - `Red`
-    - `Bl` (Watch the suggestions appear!)
-    - `#FF`
+    **Features:**
+    - Case‑insensitive input
+    - Supports multiple names for the same hex code
+    - Real‑time color preview
+    - RGB values shown
+    
+    **Examples:**
+    - `Red` → `#FF0000`
+    - `#FFFFFF` → `White`
+    - `#E32636` → `Alizarin Crimson`
     """)
     st.markdown("""
-    <div class="disclaimer">
-    📌 <strong>NOTE:</strong> Uses a limited color database.
+    <div class="info-box">
+    📚 <strong>Data Source:</strong> Combined from various color databases.
     </div>
     """, unsafe_allow_html=True)
     
     if colors_dict:
         import random
-        st.header("🎲 Random Discovery")
-        if st.button("I'm Feeling Lucky"):
+        st.header("🎲 Random Color")
+        if st.button("Pick a random color"):
             random_name = random.choice(list(colors_dict.keys()))
             random_code = colors_dict[random_name]
             st.markdown(f"**{random_name}** → `{random_code}`")
-            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; border: 1px solid #ccc;"></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
