@@ -287,20 +287,21 @@ st.markdown("""
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
 
-# ========= TAB 1: Single autocomplete dropdown =========
+
+def search_colors(query: str, **kwargs) -> list:
+    """Return color names that start with the query."""
+    if not query or len(query.strip()) == 0:
+        return []  # No dropdown until user types
+    query_lower = query.strip().lower()
+    matches = [
+        name for name in sorted(colors_dict.keys())
+        if name.lower().startswith(query_lower)
+    ]
+    return matches[:50]  # Limit results
+
 with tab1:
     st.subheader("Enter a color name")
     
-    # Define a search function that returns colors starting with the query
-    def search_colors(query: str) -> list:
-        if not query or len(query) == 0:
-            return []  # No dropdown until user types
-        query_lower = query.lower()
-        # Return only colors that START with the query
-        matches = [name for name in sorted(colors_dict.keys()) if name.lower().startswith(query_lower)]
-        return matches[:50]  # Limit results for performance
-    
-    # Single widget: type to see dropdown, filters as you type
     selected_name = st_searchbox(
         search_function=search_colors,
         placeholder="Type a letter (e.g., R, B, G)...",
@@ -309,7 +310,6 @@ with tab1:
         default=None
     )
     
-    # When a color is selected
     if selected_name:
         results = search_color_names(selected_name, colors_dict, max_results=8)
         if results:
