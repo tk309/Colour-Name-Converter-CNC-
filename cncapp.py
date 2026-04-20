@@ -264,6 +264,35 @@ tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color N
 # ========= TAB 1: Color Name to Hex =========
 with tab1:
     st.subheader("Enter a color name")
+
+    # Live autocomplete dropdown — type to filter all color names
+    all_color_names = [""] + sorted(colors_dict.keys())
+    selected_name = st.selectbox(
+        "Color Name:",
+        options=all_color_names,
+        index=0,
+        placeholder="Type to search — e.g. Red, Midnight Blue, Crimson…",
+        help="Start typing to filter through all available color names.",
+        key="name_select"
+    )
+
+    if selected_name:
+        results = search_color_names(selected_name, colors_dict, max_results=8)
+        if results:
+            st.markdown(
+                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
+                unsafe_allow_html=True
+            )
+            render_result_cards(results)
+        else:
+            st.error(f"❌ No colors found matching '{selected_name}'.")
+
+    with st.form(key="name_form"):
+        color_name_input = st.text_input(
+            "Or type a color name manually:",
+            placeholder="e.g., Red, Midnight Blue, Crimson",
+            key="name_input"
+        )
     with st.form(key="name_form"):
         color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
         # Center the button using columns
