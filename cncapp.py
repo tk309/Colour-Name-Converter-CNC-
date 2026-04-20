@@ -224,12 +224,22 @@ def search_hex_codes(query, colors_dict, max_results=8):
         return []
         
     q = query.strip().upper()
-    if q and not q.startswith("#"):
+    if not q.startswith("#"):
         q = "#" + q
-
+    
+    # Check if user typed a complete valid hex code (7 characters including #)
+    is_complete_hex = len(q) == 7 and validate_code(q)
+    
     results = []
-
-
+    
+    if is_complete_hex:
+        # EXACT MATCH ONLY - find the color name(s) for this exact hex
+        exact_names = convert_code(q, colors_dict)
+        if exact_names:
+            for name in exact_names[:max_results]:
+                results.append(f"{q} - {name}")
+        # Return ONLY the exact match(es) - no prefix matches, no closest colors
+        return results
         
     # 1. Prefix matches (user is typing partial hex)
     prefix_matches = []
