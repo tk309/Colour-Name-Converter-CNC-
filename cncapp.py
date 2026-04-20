@@ -67,6 +67,18 @@ st.markdown("""
         background-color: #E04343;
         color: white;
     }
+
+    /* ── Search engine result cards ── */
+    .search-result-card {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
