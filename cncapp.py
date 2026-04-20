@@ -287,12 +287,7 @@ with tab1:
         else:
             st.error(f"❌ No colors found matching '{selected_name}'.")
 
-    with st.form(key="name_form"):
-        color_name_input = st.text_input(
-            "Or type a color name manually:",
-            placeholder="e.g., Red, Midnight Blue, Crimson",
-            key="name_input"
-        )
+   
     with st.form(key="name_form"):
         color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
         # Center the button using columns
