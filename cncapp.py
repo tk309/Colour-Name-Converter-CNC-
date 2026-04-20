@@ -320,39 +320,93 @@ with tab1:
             render_result_cards(results)
             
 # ========= TAB 2: Hex to Color Name =========
+from streamlit_searchbox import st_searchbox
+
+def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
+    """
+    Search function for hex codes.
+    Returns formatted strings that look like "HexCode - ColorName"
+    Dropdown appears only after typing.
+    """
+    if not query or len(query.strip()) == 0:
+        return []
+    
+    query = query.strip().upper()
+    if not query.startswith("#"):
+        query = "#" + query
+    
+    results = []
+    
+    # 1. Prefix matches (user is typing partial hex)
+    prefix_matches = []
+    for name, code in colors_dict.items():
+        code_upper = code.upper()
+        if code_upper.startswith(query):
+            prefix_matches.append((name, code))
+    
+    # Sort prefix matches by hex code
+    prefix_matches.sort(key=lambda x: x[1])
+    
+    # Add formatted strings for prefix matches
+    for name, code in prefix_matches[:15]:  # Limit to 15
+        results.append(f"{code} - {name}")
+    
+    # 2. If user typed a complete valid hex (6 digits), add closest matches
+    if len(query) == 7 and validate_code(query):  # Full hex like #FF0000
+        # Find closest colors by RGB distance
+        scored = sorted(
+            colors_dict.items(),
+            key=lambda item: color_distance(query, item[1])
+        )
+        for name, code in scored[:8]:  # Add top 8 closest
+            formatted = f"{code} - {name}"
+            if formatted not in results:  # Avoid duplicates
+                results.append(formatted)
+    
+    return results[:20]  # Return max 20 results
+
 with tab2:
     st.subheader("Enter a hex color code")
-
-    # Live partial-hex search — results update as you type
-    live_hex = st.text_input(
-        "Live hex search:",
-        placeholder="Start typing — e.g. #FF, #FF4B, #FF4B4B",
-        key="live_hex_input",
-        help="Results update as you type. Prefix matches appear first; closest colors shown for a full 6-digit code."
+    
+    selected_hex_result = st_searchbox(
+        search_function=search_hex_codes_autocomplete,
+        placeholder="Start typing hex code (e.g., F, FF, FF4, #FF0000)...",
+        key="hex_searchbox",
+        clearable=True,
+        default=None
     )
-
-    if live_hex:
-        live_q = live_hex.strip()
-        if not live_q.startswith("#"):
-            live_q = "#" + live_q
-        results = search_hex_codes(live_q, colors_dict, max_results=8)
-        if results:
-            match_types = {r[2] for r in results}
-            if "closest" in match_types and "exact" not in match_types:
-                st.markdown(
-                    f'<div class="no-exact-banner">⚠️ No exact match for <strong>{live_q.upper()}</strong>. '
-                    f'Showing the {len(results)} visually closest color(s):</div>',
-                    unsafe_allow_html=True
-                )
+    
+    # Parse the selection (format: "#FF0000 - Red")
+    if selected_hex_result:
+        # Extract hex code and color name from the formatted string
+        if " - " in selected_hex_result:
+            hex_code, color_name = selected_hex_result.split(" - ", 1)
+        else:
+            hex_code = selected_hex_result
+            color_name = None
+        
+        # Display the selected color details
+        if hex_code and validate_code(hex_code):
+            # Find matching color names
+            matching_names = convert_code(hex_code, colors_dict)
+            
+            if matching_names:
+                # Show results as cards
+                results_to_show = [(name, hex_code, "exact") for name in matching_names]
+                render_result_cards(results_to_show)
+            elif color_name:
+                # If we have the name from the selection
+                results_to_show = [(color_name, hex_code, "exact")]
+                render_result_cards(results_to_show)
             else:
+                # No exact match found, show closest colors
                 st.markdown(
-                    f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{live_q.upper()}</strong>"</div>',
+                    f'<div class="no-exact-banner">⚠️ No exact match for <strong>{hex_code}</strong>. '
+                    f'But you selected it from suggestions!</div>',
                     unsafe_allow_html=True
                 )
-            render_result_cards(results)
-        elif len(live_q) > 1:
-            st.info("No colors match that prefix yet. Keep typing…")
-
+        else:
+            st.error(f"❌ Invalid hex code format: {hex_code}")
 
 
 # Sidebar
