@@ -320,16 +320,6 @@ with tab1:
             st.error(f"❌ No colors found matching '{selected_name}'.")
 
     with st.form(key="name_form"):
-        color_name_input = st.text_input(
-            "Or type a color name manually:",
-            placeholder="e.g., Red, Midnight Blue, Crimson",
-            key="name_input"
-        )
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            submitted_name = st.form_submit_button("Convert")
-
-        with st.form(key="name_form"):
         color_name_input = st.text_input("Color Name:", placeholder="e.g., Red, Midnight Blue, Crimson", key="name_input")
         # Center the button using columns
         col1, col2, col3 = st.columns([1, 2, 1])
