@@ -377,36 +377,25 @@ with tab2:
             st.info("No colors match that prefix yet. Keep typing…")
 
     with st.form(key="hex_form"):
-        hex_input_raw = st.text_input(
-            "Or submit an exact hex code:",
-            placeholder="e.g., #FF0000, #FFFFFF",
-            key="hex_input"
-        )
+        hex_input_raw = st.text_input("Hex Code:", placeholder="e.g., #FF0000, #FFFFFF", key="hex_input")
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             submitted_hex = st.form_submit_button("Convert")
-
+        
         if submitted_hex:
             if hex_input_raw:
                 hex_input = hex_input_raw.strip().upper()
                 if validate_code(hex_input):
-                    results = search_hex_codes(hex_input, colors_dict, max_results=8)
-                    if results:
-                        exact_hits = [r for r in results if r[2] == "exact"]
-                        if not exact_hits:
-                            st.markdown(
-                                f'<div class="no-exact-banner">⚠️ <strong>{hex_input}</strong> is not in the database. '
-                                f'Showing the {len(results)} visually closest color(s):</div>',
-                                unsafe_allow_html=True
-                            )
+                    names = convert_code(hex_input, colors_dict)
+                    if names:
+                        if len(names) == 1:
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{names[0]}</strong></div>', unsafe_allow_html=True)
                         else:
-                            st.markdown(
-                                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{hex_input}</strong>"</div>',
-                                unsafe_allow_html=True
-                            )
-                        render_result_cards(results)
+                            st.markdown(f'<div class="result-box">✅ <strong>{hex_input}</strong> → <strong>{", ".join(names)}</strong><br><small>(Multiple names)</small></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="color-preview" style="background-color: {hex_input};"></div>', unsafe_allow_html=True)
+                        st.caption(f"RGB: {tuple(int(hex_input.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))}")
                     else:
-                        st.error(f"❌ No results found for {hex_input}.")
+                        st.error(f"❌ Hex code {hex_input} not found in database.")
                 else:
                     st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits.")
             else:
