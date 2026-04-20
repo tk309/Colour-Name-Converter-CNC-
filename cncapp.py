@@ -288,37 +288,49 @@ tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color N
 
 
 
-def search_colors(query: str, **kwargs) -> list:
-    """Return color names that start with the query."""
-    if not query or len(query.strip()) == 0:
-        return []  # No dropdown until user types
-    query_lower = query.strip().lower()
-    matches = [
-        name for name in sorted(colors_dict.keys())
-        if name.lower().startswith(query_lower)
-    ]
-    return matches[:50]  # Limit results
-
 with tab1:
     st.subheader("Enter a color name")
     
-    selected_name = st_searchbox(
-        search_function=search_colors,
-        placeholder="Type a letter (e.g., R, B, G)...",
-        key="color_searchbox",
-        clearable=True,
-        default=None
+    # Single text input
+    user_input = st.text_input(
+        "Color name",
+        placeholder="Start typing (e.g., R, Re, Red...)",
+        key="single_input"
     )
     
-    if selected_name:
-        results = search_color_names(selected_name, colors_dict, max_results=8)
-        if results:
-            st.markdown(
-                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
-                unsafe_allow_html=True
-            )
-            render_result_cards(results)
-
+    # Only show suggestions if user typed something
+    if user_input and user_input.strip():
+        query = user_input.strip().lower()
+        matches = [
+            name for name in sorted(colors_dict.keys())
+            if name.lower().startswith(query)
+        ][:20]  # Show top 20
+        
+        if matches:
+            # Create a container that looks like a dropdown
+            with st.container():
+                st.markdown("---")  # separator
+                for name in matches:
+                    # Each suggestion is a button that looks like a dropdown item
+                    if st.button(
+                        name,
+                        key=f"sugg_{name}",
+                        use_container_width=True,
+                        type="secondary"
+                    ):
+                        # When clicked, show the color results
+                        results = search_color_names(name, colors_dict, max_results=8)
+                        if results:
+                            st.markdown(
+                                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{name}</strong>"</div>',
+                                unsafe_allow_html=True
+                            )
+                            render_result_cards(results)
+                        st.rerun()  # Clear the suggestions after selection
+        elif len(query) > 0:
+            st.info(f"No colors start with '{query}'")
+    else:
+        st.caption("⌨️ Type a letter – suggestions will appear below")
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
     st.subheader("Enter a hex color code")
