@@ -7,6 +7,7 @@ import streamlit as st
 import csv
 import re
 from pathlib import Path
+from streamlit_searchbox import st_searchbox
 
 st.set_page_config(
     page_title="Color Name Converter",
@@ -285,73 +286,38 @@ st.markdown("""
 
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
-# ========= TAB 1: Color Name to Hex (True Dropdown) =========
+
+# ========= TAB 1: Single autocomplete dropdown =========
 with tab1:
     st.subheader("Enter a color name")
     
-    # Initialize session state for dropdown visibility
-    if "show_dropdown" not in st.session_state:
-        st.session_state.show_dropdown = False
-    if "typed_prefix" not in st.session_state:
-        st.session_state.typed_prefix = ""
+    # Define a search function that returns colors starting with the query
+    def search_colors(query: str) -> list:
+        if not query or len(query) == 0:
+            return []  # No dropdown until user types
+        query_lower = query.lower()
+        # Return only colors that START with the query
+        matches = [name for name in sorted(colors_dict.keys()) if name.lower().startswith(query_lower)]
+        return matches[:50]  # Limit results for performance
     
-    # Single text input - user types here
-    user_input = st.text_input(
-        "Type a color name:",
-        placeholder="e.g., R, Re, Red, Bla, Black...",
-        key="color_input",
-        on_change=lambda: st.session_state.update({"show_dropdown": True, "typed_prefix": st.session_state.color_input})
+    # Single widget: type to see dropdown, filters as you type
+    selected_name = st_searchbox(
+        search_function=search_colors,
+        placeholder="Type a letter (e.g., R, B, G)...",
+        key="color_searchbox",
+        clearable=True,
+        default=None
     )
     
-    # Update session state when typing
-    if user_input and user_input.strip():
-        st.session_state.typed_prefix = user_input.strip().lower()
-        st.session_state.show_dropdown = True
-    else:
-        st.session_state.show_dropdown = False
-    
-    # Show dropdown ONLY if user has typed something
-    if st.session_state.show_dropdown and st.session_state.typed_prefix:
-        query = st.session_state.typed_prefix
-        
-        # Filter colors that START WITH the query
-        matching_colors = [
-            name for name in sorted(colors_dict.keys())
-            if name.lower().startswith(query)
-        ]
-        
-        if matching_colors:
-            # Create a placeholder for the dropdown
-            dropdown_placeholder = st.empty()
-            
-            with dropdown_placeholder.container():
-                selected_name = st.selectbox(
-                    f"📋 Select a color (showing {len(matching_colors)} color(s) starting with '{query}'):",
-                    options=[""] + matching_colors,  # Empty option as default
-                    key="color_dropdown",
-                    label_visibility="visible"
-                )
-                
-                # When user selects a color (not the empty option)
-                if selected_name and selected_name != "":
-                    # Show results
-                    results = search_color_names(selected_name, colors_dict, max_results=8)
-                    if results:
-                        st.markdown(
-                            f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
-                            unsafe_allow_html=True
-                        )
-                        render_result_cards(results)
-                    
-                    # Optional: Clear the dropdown after selection
-                    # st.session_state.show_dropdown = False
-                    # st.rerun()
-        else:
-            st.info(f"😕 No color names start with '{query}'. Try a different letter.")
-    else:
-        # Show hint when no input
-        st.caption("⌨️ Start typing a letter (e.g., 'R', 'B', 'G') to see matching colors in the dropdown.")
-
+    # When a color is selected
+    if selected_name:
+        results = search_color_names(selected_name, colors_dict, max_results=8)
+        if results:
+            st.markdown(
+                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
+                unsafe_allow_html=True
+            )
+            render_result_cards(results)
 
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
