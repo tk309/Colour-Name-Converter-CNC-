@@ -241,7 +241,7 @@ def search_hex_codes(query, colors_dict, max_results=8):
         # Return ONLY the exact match(es) - no prefix matches, no closest colors
         return results
         
-    # 1. Prefix matches (user is typing partial hex)
+    # Prefix matches (user is typing partial hex)
     prefix_matches = []
     for name, code in colors_dict.items():
         code_upper = code.upper()
@@ -252,21 +252,6 @@ def search_hex_codes(query, colors_dict, max_results=8):
     for name, code in prefix_matches[:max_results]:
         results.append(f"{code} - {name}")
     
-    # 2. If user typed a full valid hex, add closest matches
-    if len(q) == 7 and validate_code(q):
-        # Filter to only valid color codes
-        valid_items = [
-            (name, code) for name, code in colors_dict.items()
-            if validate_code(code)
-        ]
-        scored = sorted(
-            valid_items,
-            key=lambda item: color_distance(q, item[1])
-        )
-        for name, code in scored[:max_results]:
-            formatted = f"{code} - {name}"
-            if formatted not in results:
-                results.append(formatted)
     
     return results[:max_results]
 
