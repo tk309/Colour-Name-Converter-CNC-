@@ -79,6 +79,46 @@ st.markdown("""
         align-items: center;
         gap: 1rem;
     }
+    .search-result-swatch {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        flex-shrink: 0;
+        border: 1px solid #444;
+    }
+    .search-result-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #FF8C69;
+    }
+    .search-result-sub {
+        font-size: 0.85rem;
+        color: #aaa;
+        margin-top: 2px;
+    }
+    .search-result-badge {
+        font-size: 0.75rem;
+        background-color: #2e2e2e;
+        color: #ccc;
+        border: 1px solid #444;
+        border-radius: 12px;
+        padding: 2px 8px;
+        margin-right: 4px;
+    }
+    .search-stats {
+        font-size: 0.8rem;
+        color: #888;
+        margin: 0.4rem 0 0.75rem 0;
+    }
+    .no-exact-banner {
+        background-color: #2a1a00;
+        border-left: 4px solid #FF8C00;
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem;
+        color: #FFB347;
+        margin-bottom: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
