@@ -22,14 +22,7 @@ st.markdown("""
         color: #FF4B4B;
         margin-bottom: 1rem;
     }
-    .result-box {
-        background-color: #BF5700;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        text-align: center;
-        font-size: 1.2rem;
-    }
+    
     .color-preview {
         width: 100%;
         height: 100px;
