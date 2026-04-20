@@ -229,8 +229,7 @@ def search_hex_codes(query, colors_dict, max_results=8):
 
     results = []
 
-    if not q or q == "#":
-        return []
+
         
     # 1. Prefix matches (user is typing partial hex)
     prefix_matches = []
