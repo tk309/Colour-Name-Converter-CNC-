@@ -285,54 +285,38 @@ st.markdown("""
 
 tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
 
-# ========= TAB 1: Color Name to Hex (with "starts with" dropdown) =========
+# ========= TAB 1: Color Name to Hex (single autocomplete widget) =========
 with tab1:
     st.subheader("Enter a color name")
 
-    # 1. Text input – user types here first
-    typed_name = st.text_input(
-        "Start typing a color name:",
-        placeholder="e.g., R, Re, Red, Bla...",
-        key="color_name_input",
-        help="Type at least one letter. Only colors that start with your input will appear."
+    # Single autocomplete widget – dropdown appears only after typing
+    selected_name = st_autocomplete(
+        options=sorted(colors_dict.keys()),          # all color names, sorted
+        placeholder="Type a letter (e.g., R, B, G)...",
+        key="color_autocomplete",
+        case_sensitive=False,
+        # Filter function: only show names that START with the typed query
+        filter_func=lambda name, query: name.lower().startswith(query.lower()) if query else False,
+        # Do not show any options when query is empty
+        empty_option=None,
+        # Limit how many suggestions appear
+        max_items=50
     )
 
-    # 2. Only show dropdown if user has typed something
-    if typed_name and typed_name.strip():
-        query = typed_name.strip().lower()
-        
-        # Filter color names that START WITH the query (case‑insensitive)
-        matching_names = [
-            name for name in colors_dict.keys()
-            if name.lower().startswith(query)
-        ]
-        matching_names.sort()  # alphabetical order
-        
-        if matching_names:
-            # Display a selectbox with the filtered names
-            selected_name = st.selectbox(
-                "Select a color (or continue typing to narrow further):",
-                options=[""] + matching_names,  # empty first option as default
-                key="filtered_color_select"
+    # When a name is selected (or typed and chosen)
+    if selected_name:
+        # Use the existing search engine to show result cards
+        results = search_color_names(selected_name, colors_dict, max_results=8)
+        if results:
+            st.markdown(
+                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
+                unsafe_allow_html=True
             )
-            
-            # If the user selects a name, show the conversion results
-            if selected_name:
-                # Use the existing search engine (shows exact, starts‑with, contains, etc.)
-                results = search_color_names(selected_name, colors_dict, max_results=8)
-                if results:
-                    st.markdown(
-                        f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
-                        unsafe_allow_html=True
-                    )
-                    render_result_cards(results)
-                else:
-                    st.error(f"❌ No colors found matching '{selected_name}'.")
+            render_result_cards(results)
         else:
-            st.info(f"😕 No color names start with '{typed_name}'. Try a different letter.")
+            st.error(f"❌ No colors found matching '{selected_name}'.")
     else:
-        # Optional: friendly hint when input is empty
-        st.info("⌨️ Type a letter (e.g., 'R' for Red, 'B' for Blue) to see matching colors.")
+        st.info("⌨️ Start typing – only colors beginning with your letters will appear.")
     
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
