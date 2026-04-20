@@ -1,12 +1,13 @@
 # Project: Color Name Converter (CNC)
 # Author: Timothy Kemiki
 # Date: 2025/2026
-# Description: A unified search engine to find colors by name or hex code.
+# Description: A real-time live search engine for colors.
 
 import streamlit as st
 import csv
 import re
 from pathlib import Path
+from st_keyup import st_keyup  # New import for live keystroke tracking
 
 st.set_page_config(
     page_title="Color Search Engine",
@@ -58,37 +59,11 @@ st.markdown("""
         margin: 1rem 0;
         color: white;
     }
-    div.stButton > button {
-        background-color: #FF4B4B;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        padding: 0.5rem 2rem;
-        width: 100%;
-        font-size: 1rem;
-        border: none;
-    }
-    div.stButton > button:hover {
-        background-color: #E04343;
-        color: white;
+    /* Hide the default st_keyup label for a cleaner look */
+    div[data-testid="stKeyup"] label {
+        display: none;
     }
 </style>
-""", unsafe_allow_html=True)
-
-# JavaScript to hide keyboard on mobile
-st.markdown("""
-<script>
-function blurActiveElement() {
-    if (document.activeElement && document.activeElement.blur) {
-        document.activeElement.blur();
-    }
-}
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.stButton button')) {
-        setTimeout(blurActiveElement, 50);
-    }
-});
-</script>
 """, unsafe_allow_html=True)
 
 @st.cache_data
@@ -120,87 +95,100 @@ if not colors_dict:
 
 # Header
 st.markdown('<h1 class="main-header">🎨 Color Search</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Search by name (e.g., "Crimson") or hex code (e.g., "#DC143C")</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Start typing a name (e.g., "Crimson") or hex code (e.g., "#DC143C")</p>', unsafe_allow_html=True)
 
-# The Omni-Search Bar
-with st.form(key="search_form"):
-    query = st.text_input("Search:", label_visibility="collapsed", placeholder="Enter a color name or hex code...")
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        submitted = st.form_submit_button("🔍 Search")
+# ---------------------------------------------------------
+# THE LIVE OMNI-SEARCH BAR
+# debounce=300 means it waits 300ms after the user stops typing to search (prevents lag)
+# ---------------------------------------------------------
+query = st_keyup(
+    "Search:", 
+    placeholder="Type to search colors instantly...", 
+    key="live_search", 
+    debounce=300
+)
 
-if submitted:
-    if not query.strip():
-        st.warning("Please enter a search term.")
-    else:
-        query_clean = query.strip()
-        is_hex = False
+# Live processing as the user types
+if query:
+    query_clean = query.strip()
+    
+    # 1. Check if the input looks like a hex code (with or without #)
+    if re.match(r"^#?[a-fA-F0-9]{1,6}$", query_clean) and any(char.isdigit() for char in query_clean):
+        # We treat it as hex if it matches the pattern and contains numbers 
+        # (to avoid treating names like "AABB" as hex prematurely)
+        hex_query = query_clean if query_clean.startswith('#') else f"#{query_clean}"
+        hex_query = hex_query.upper()
         
-        # 1. Check if the input looks like a hex code (with or without #)
-        if re.match(r"^#?[a-fA-F0-9]{6}$", query_clean):
-            is_hex = True
-            hex_query = query_clean if query_clean.startswith('#') else f"#{query_clean}"
-            hex_query = hex_query.upper()
+        # Exact match
+        matching_names = [name for name, hx in colors_dict.items() if hx == hex_query]
+        
+        if matching_names:
+            title = f"<strong>{hex_query}</strong> → <strong>{', '.join(matching_names)}</strong>"
+            display_main_result(title, hex_query)
             
-            # Find all names matching this hex code
-            matching_names = [name for name, hx in colors_dict.items() if hx == hex_query]
+        # Live Hex Suggestions (e.g., they typed "#FF", show all starting with #FF)
+        elif len(hex_query) < 7:
+            st.markdown(f"**Suggestions starting with `{hex_query}`:**")
+            hex_suggestions = [(name, hx) for name, hx in colors_dict.items() if hx.startswith(hex_query)][:12]
             
-            if matching_names:
-                title = f"<strong>{hex_query}</strong> → <strong>{', '.join(matching_names)}</strong>"
-                display_main_result(title, hex_query)
-            else:
-                st.error(f"❌ Hex code '{hex_query}' not found in the database.")
-                
-        # 2. Treat input as a Color Name
-        else:
-            search_term = query_clean.title().replace("’", "'")
-            search_lower = query_clean.lower()
-            
-            # Look for an exact match first
-            exact_match_hex = colors_dict.get(search_term)
-            
-            # Look for partial matches
-            partial_matches = []
-            for name, hx in colors_dict.items():
-                if search_lower in name.lower() and name != search_term:
-                    partial_matches.append((name, hx))
-            
-            # Display logic
-            if exact_match_hex:
-                title = f"<strong>{search_term}</strong> → <strong>{exact_match_hex}</strong>"
-                display_main_result(title, exact_match_hex)
-            
-            if partial_matches:
-                if exact_match_hex:
-                    st.divider()
-                    st.subheader(f"Related matches for '{query_clean}':")
-                else:
-                    st.success(f"No exact match for '{query_clean}', but we found these related colors:")
-                
-                # Limit to 10 partial matches to avoid overwhelming the UI
-                partial_matches = sorted(partial_matches, key=lambda x: x[0])[:12]
-                
-                # Display in a grid
+            if hex_suggestions:
                 cols = st.columns(3)
-                for idx, (pm_name, pm_hex) in enumerate(partial_matches):
+                for idx, (pm_name, pm_hex) in enumerate(hex_suggestions):
                     with cols[idx % 3]:
                         st.markdown(f"**{pm_name}**<br>`{pm_hex}`", unsafe_allow_html=True)
                         st.markdown(f'<div class="partial-match-preview" style="background-color: {pm_hex};"></div>', unsafe_allow_html=True)
+            else:
+                st.caption("No matching hex codes found yet.")
 
-            if not exact_match_hex and not partial_matches:
-                st.error(f"❌ No colors found matching '{query_clean}'.")
+    # 2. Treat input as a Color Name
+    else:
+        search_term = query_clean.title().replace("’", "'")
+        search_lower = query_clean.lower()
+        
+        # Look for an exact match first
+        exact_match_hex = colors_dict.get(search_term)
+        
+        # Look for partial matches (Live suggestions)
+        partial_matches = []
+        for name, hx in colors_dict.items():
+            if search_lower in name.lower() and name != search_term:
+                partial_matches.append((name, hx))
+        
+        # Display logic
+        if exact_match_hex:
+            title = f"<strong>{search_term}</strong> → <strong>{exact_match_hex}</strong>"
+            display_main_result(title, exact_match_hex)
+        
+        if partial_matches:
+            if exact_match_hex:
+                st.divider()
+                st.subheader("Similar colors:")
+            else:
+                st.markdown(f"**Suggestions for '{query_clean}':**")
+            
+            # Limit to 12 partial matches for clean UI
+            partial_matches = sorted(partial_matches, key=lambda x: x[0])[:12]
+            
+            # Display in a grid
+            cols = st.columns(3)
+            for idx, (pm_name, pm_hex) in enumerate(partial_matches):
+                with cols[idx % 3]:
+                    st.markdown(f"**{pm_name}**<br>`{pm_hex}`", unsafe_allow_html=True)
+                    st.markdown(f'<div class="partial-match-preview" style="background-color: {pm_hex};"></div>', unsafe_allow_html=True)
 
-# Sidebar remains the same
+        if not exact_match_hex and not partial_matches:
+            st.error(f"❌ No colors found matching '{query_clean}'.")
+
+# Sidebar
 with st.sidebar:
     st.header("ℹ️ ABOUT")
     st.markdown("""
-    This search engine seamlessly finds colors by their **name** or **hexadecimal code**.
+    This search engine seamlessly finds colors by their **name** or **hexadecimal code** in real-time.
     
-    **Try searching for:**
+    **Try typing:**
     - `Red`
-    - `Dark Blue` (Notice the partial matches!)
-    - `#FFFFFF`
-    - `E32636` (Works without the # symbol)
+    - `Bl` (Watch the suggestions appear!)
+    - `#FF`
     """)
     st.markdown("""
     <div class="disclaimer">
