@@ -366,9 +366,6 @@ def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
     # Add formatted strings for prefix matches
     for name, code in prefix_matches[:15]:  # Limit to 15
         results.append(f"{code} - {name}")
-
-
-
     
     return results[:20]  # Return max 20 results
     
