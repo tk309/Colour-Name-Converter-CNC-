@@ -166,6 +166,19 @@ def convert_name(name, colors_dict):
     name = name.title().replace("’", "'")
     return colors_dict.get(name)
 
+# ── SEARCH ENGINE HELPERS ────────────────────────────────────────────────────
+
+def hex_to_rgb(hex_code):
+    """Convert a hex code string to an (R, G, B) tuple."""
+    h = hex_code.lstrip("#")
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+def color_distance(hex1, hex2):
+    """Euclidean distance between two hex colors in RGB space."""
+    r1, g1, b1 = hex_to_rgb(hex1)
+    r2, g2, b2 = hex_to_rgb(hex2)
+    return ((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2) ** 0.5
+
 colors_dict = load_colors()
 if not colors_dict:
     st.stop()
