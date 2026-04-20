@@ -277,7 +277,7 @@ with tab1:
     )
 
     if selected_name:
-        results = search_color_names(selected_name, colors_dict, max_results=8)
+        results = search_color_names(selected_name, colors_dict, max_results=3)
         if results:
             st.markdown(
                 f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
