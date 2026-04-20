@@ -168,6 +168,83 @@ def convert_name(name, colors_dict):
 
 # ── SEARCH ENGINE HELPERS ────────────────────────────────────────────────────
 
+def hex_to_rgb(hex_code):
+    """Convert a hex code string to an (R, G, B) tuple."""
+    h = hex_code.lstrip("#")
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+def color_distance(hex1, hex2):
+    """Euclidean distance between two hex colors in RGB space."""
+    r1, g1, b1 = hex_to_rgb(hex1)
+    r2, g2, b2 = hex_to_rgb(hex2)
+    return ((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2) ** 0.5
+
+def search_color_names(query, colors_dict, max_results=8):
+    """
+    Search engine for color names.
+    Priority: exact match → starts with query → word starts with query → contains query.
+    Returns a list of (name, hex_code, match_type) tuples.
+    """
+    q = query.strip().lower()
+    if not q:
+        return []
+
+    exact, starts, word_starts, contains = [], [], [], []
+
+    for name, code in colors_dict.items():
+        name_lower = name.lower()
+        words = name_lower.split()
+        if name_lower == q:
+            exact.append((name, code, "exact"))
+        elif name_lower.startswith(q):
+            starts.append((name, code, "starts_with"))
+        elif any(w.startswith(q) for w in words):
+            word_starts.append((name, code, "word_match"))
+        elif q in name_lower:
+            contains.append((name, code, "contains"))
+
+    for tier in (starts, word_starts, contains):
+        tier.sort(key=lambda x: x[0])
+
+    return (exact + starts + word_starts + contains)[:max_results]
+
+def search_hex_codes(query, colors_dict, max_results=8):
+    """
+    Search engine for hex codes.
+    Priority: exact match → prefix match → closest by RGB distance.
+    Returns a list of (name, hex_code, match_type) tuples.
+    """
+    q = query.strip().upper()
+    if q and not q.startswith("#"):
+        q = "#" + q
+
+    if not q or q == "#":
+        return []
+
+    # Exact match
+    exact_names = convert_code(q, colors_dict)
+    if exact_names:
+        return [(n, q, "exact") for n in exact_names]
+
+    # Prefix search — user is still typing (e.g. "#FF4")
+    prefix_results = [
+        (name, code, "prefix")
+        for name, code in colors_dict.items()
+        if code.upper().startswith(q)
+    ]
+    prefix_results.sort(key=lambda x: x[1])
+    if prefix_results:
+        return prefix_results[:max_results]
+
+    # Closest colors by RGB distance — only for full valid hex codes
+    if validate_code(q):
+        scored = sorted(
+            colors_dict.items(),
+            key=lambda item: color_distance(q, item[1])
+        )
+        return [(name, code, "closest") for name, code in scored[:max_results]]
+
+    return []
 
 colors_dict = load_colors()
 if not colors_dict:
