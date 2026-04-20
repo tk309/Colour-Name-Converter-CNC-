@@ -320,7 +320,6 @@ with tab1:
             render_result_cards(results)
             
 # ========= TAB 2: Hex to Color Name =========
-from streamlit_searchbox import st_searchbox
 
 def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
     """
