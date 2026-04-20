@@ -57,7 +57,7 @@ st.markdown("""
     }
     div.stButton > button:hover {
         background-color: #E04343;
-        color: red;
+        color: white;
     }
 
     /* ── Search engine result cards ── */
@@ -311,42 +311,7 @@ with tab1:
         else:
             st.error(f"❌ No colors found matching '{selected_name}'.")
 
-    with st.form(key="name_form"):
-        color_name_input = st.text_input(
-            "Or type a color name manually:",
-            placeholder="e.g., Red, Midnight Blue, Crimson",
-            key="name_input"
-        )
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            submitted_name = st.form_submit_button("Convert")
-
-        if submitted_name:
-            if color_name_input:
-                color_name = color_name_input.strip()
-                if validate_name(color_name):
-                    results = search_color_names(color_name, colors_dict, max_results=8)
-                    if results:
-                        exact_hits = [r for r in results if r[2] == "exact"]
-                        if not exact_hits:
-                            st.markdown(
-                                f'<div class="no-exact-banner">⚠️ No exact match for "<strong>{color_name}</strong>". '
-                                f'Showing {len(results)} related result(s):</div>',
-                                unsafe_allow_html=True
-                            )
-                        else:
-                            st.markdown(
-                                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{color_name}</strong>"</div>',
-                                unsafe_allow_html=True
-                            )
-                        render_result_cards(results)
-                    else:
-                        st.error(f"❌ Color name '{color_name}' not found in database.")
-                else:
-                    st.error("❌ Invalid color name. Use only letters, spaces, and apostrophes.")
-            else:
-                st.warning("Please enter a color name.")
-
+    
 # ========= TAB 2: Hex to Color Name =========
 with tab2:
     st.subheader("Enter a hex color code")
@@ -381,41 +346,7 @@ with tab2:
         elif len(live_q) > 1:
             st.info("No colors match that prefix yet. Keep typing…")
 
-    with st.form(key="hex_form"):
-        hex_input_raw = st.text_input(
-            "Or submit an exact hex code:",
-            placeholder="e.g., #FF0000, #FFFFFF",
-            key="hex_input"
-        )
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            submitted_hex = st.form_submit_button("Convert")
 
-        if submitted_hex:
-            if hex_input_raw:
-                hex_input = hex_input_raw.strip().upper()
-                if validate_code(hex_input):
-                    results = search_hex_codes(hex_input, colors_dict, max_results=8)
-                    if results:
-                        exact_hits = [r for r in results if r[2] == "exact"]
-                        if not exact_hits:
-                            st.markdown(
-                                f'<div class="no-exact-banner">⚠️ <strong>{hex_input}</strong> is not in the database. '
-                                f'Showing the {len(results)} visually closest color(s):</div>',
-                                unsafe_allow_html=True
-                            )
-                        else:
-                            st.markdown(
-                                f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{hex_input}</strong>"</div>',
-                                unsafe_allow_html=True
-                            )
-                        render_result_cards(results)
-                    else:
-                        st.error(f"❌ No results found for {hex_input}.")
-                else:
-                    st.error("❌ Invalid hex code. Format: # followed by exactly 6 hex digits.")
-            else:
-                st.warning("Please enter a hex code.")
 
 # Sidebar
 with st.sidebar:
