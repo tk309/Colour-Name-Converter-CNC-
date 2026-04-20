@@ -338,48 +338,6 @@ with tab1:
             
 # ========= TAB 2: Hex to Color Name =========
 
-def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
-    """
-    Search function for hex codes.
-    Returns formatted strings that look like "HexCode - ColorName"
-    Dropdown appears only after typing.
-    """
-    if not query or len(query.strip()) == 0:
-        return []
-    
-    query = query.strip().upper()
-    if not query.startswith("#"):
-        query = "#" + query
-    
-    results = []
-    
-    # 1. Prefix matches (user is typing partial hex)
-    prefix_matches = []
-    for name, code in colors_dict.items():
-        code_upper = code.upper()
-        if code_upper.startswith(query):
-            prefix_matches.append((name, code))
-    
-    # Sort prefix matches by hex code
-    prefix_matches.sort(key=lambda x: x[1])
-    
-    # Add formatted strings for prefix matches
-    for name, code in prefix_matches[:15]:  # Limit to 15
-        results.append(f"{code} - {name}")
-    
-    # 2. If user typed a complete valid hex (6 digits), add closest matches
-    if len(query) == 7 and validate_code(query):  # Full hex like #FF0000
-        # Find closest colors by RGB distance
-        scored = sorted(
-            colors_dict.items(),
-            key=lambda item: color_distance(query, item[1])
-        )
-        for name, code in scored[:8]:  # Add top 8 closest
-            formatted = f"{code} - {name}"
-            if formatted not in results:  # Avoid duplicates
-                results.append(formatted)
-    
-    return results[:20]  # Return max 20 results
 
 with tab2:
     st.subheader("Enter a hex color code")
