@@ -47,7 +47,7 @@ st.markdown("""
         margin: 1rem 0;
     }
     div.stButton > button {
-        background-color: #FF4B4B;
+        background-color: #FFffff;
         color: white;
         font-weight: bold;
         border-radius: 8px;
@@ -57,7 +57,7 @@ st.markdown("""
         border: none;
     }
     div.stButton > button:hover {
-        background-color: #E04343;
+        background-color: #ff0000;
         color: white;
     }
 
@@ -104,12 +104,12 @@ st.markdown("""
         margin: 0.4rem 0 0.75rem 0;
     }
     .no-exact-banner {
-        background-color: #ffffff;
-        border-left: 4px solid #000000;
+        background-color: #2a1a00;
+        border-left: 4px solid #FF8C00;
         border-radius: 8px;
         padding: 0.6rem 0.9rem;
         font-size: 0.9rem;
-        color: #FF0000;
+        color: #FFB347;
         margin-bottom: 0.5rem;
     }
 </style>
