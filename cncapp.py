@@ -68,21 +68,7 @@ st.markdown("""
         text-align: center;
     }
     
-    div.stButton > button {
-        background-color: #E0434;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        padding: 0.5rem 2rem;
-        width: 100%;
-        font-size: 1rem;
-        border: none;
-    }
-    div.stButton > button:hover {
-        background-color: #008000;
-        color: white;
-    }
-
+    
     /* ── Search engine result cards ── */
     .search-result-card {
         background-color: #1e1e1e;
