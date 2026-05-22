@@ -69,6 +69,21 @@ st.markdown("""
         margin: 1rem 0;
     }
 
+    /* Style expander to look like a box */
+    .custom-expander .streamlit-expanderHeader {
+        background-color: #2a2a2a;
+        border: 1px solid #FF4B4B;
+        border-radius: 10px;
+    }
+    .custom-expander .streamlit-expanderContent {
+        background-color: #2a2a2a;
+        border-left: 1px solid #FF4B4B;
+        border-right: 1px solid #FF4B4B;
+        border-bottom: 1px solid #FF4B4B;
+        border-radius: 0 0 10px 10px;
+        padding: 0.8rem;
+    }
+
     /* ── Search engine result cards ── */
     .search-result-card {
         background-color: #1e1e1e;
@@ -445,15 +460,15 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    if colors_dict:
-        import random
-        with st.container():
-            st.markdown('<div class="random-color-box">', unsafe_allow_html=True)
-            st.header("🎲 Random Color")
-        
-            if st.button("Pick a random color"):
+if colors_dict:
+    import random
+    
+    with st.container():
+        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
+        with st.expander("🎲 Random Color", expanded=True):
+            if st.button("Pick a random color", use_container_width=True, key="random_btn"):
                 random_name = random.choice(list(colors_dict.keys()))
                 random_code = colors_dict[random_name]
                 st.markdown(f"**{random_name}** → `{random_code}`")
-                st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
