@@ -472,5 +472,17 @@ with st.sidebar:
         st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
+    
+    if colors_dict:
+        import random
+        st.header("🎲 Random Color")
+        if st.button("Pick a random color"):
+            random_name = random.choice(list(colors_dict.keys()))
+            random_code = colors_dict[random_name]
+            st.markdown(f"**{random_name}** → `{random_code}`")
+            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
+
+
+
 
     
