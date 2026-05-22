@@ -32,14 +32,14 @@ st.markdown("""
     }
     .disclaimer {
         background-color: #FF7F50;
-        border-left: 4px solid #FCEFEF;
+        border-left: 4px solid #DBECDA;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 0.9rem;
         margin: 1rem 0;
     }
     .info-box {
-        background-color: #FF8000;
+        background-color: #728774;
         border-left: 4px solid #FFF9C4;
         padding: 0.75rem;
         border-radius: 8px;
@@ -47,7 +47,7 @@ st.markdown("""
         margin: 1rem 0;
     }    
     div.stButton > button {
-        background-color: #E0434;
+        background-color: #728774;
         color: white;
         font-weight: bold;
         border-radius: 8px;
