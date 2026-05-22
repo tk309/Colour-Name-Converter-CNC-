@@ -104,7 +104,7 @@ st.markdown("""
         margin: 0.4rem 0 0.75rem 0;
     }
     .no-exact-banner {
-        background-color: #2a1a00;
+        background-color: #2a1a01;
         border-left: 4px solid #FF8C00;
         border-radius: 8px;
         padding: 0.6rem 0.9rem;
