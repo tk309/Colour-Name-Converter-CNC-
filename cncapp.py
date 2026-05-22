@@ -45,9 +45,7 @@ st.markdown("""
         border-radius: 8px;
         font-size: 0.9rem;
         margin: 1rem 0;
-    }
-    
-    
+    }    
     div.stButton > button {
         background-color: #E0434;
         color: white;
@@ -441,12 +439,9 @@ with st.sidebar:
 
     if colors_dict:
         import random
-        # Create a container with a border
-        with st.container():
-            st.markdown('<div class="random-color-card">', unsafe_allow_html=True)
-            st.markdown("🎲 Random Color")
-            if st.button("Pick a random color", use_container_width=True, key="random_btn"):
-                random_name = random.choice(list(colors_dict.keys()))
-                random_code = colors_dict[random_name]
-                st.markdown(f"**{random_name}** → `{random_code}`")
-                st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
+        st.header("🎲 Random Color")
+        if st.button("Pick a random color"):
+            random_name = random.choice(list(colors_dict.keys()))
+            random_code = colors_dict[random_name]
+            st.markdown(f"**{random_name}** → `{random_code}`")
+            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
