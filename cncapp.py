@@ -45,7 +45,28 @@ st.markdown("""
         border-radius: 8px;
         font-size: 0.9rem;
         margin: 1rem 0;
-    }    
+    }
+
+    /* ── Random color box (like info-box) ── */
+    .random-box {
+        background-color: #2a2a2a;
+        border-left: 4px solid #FF4B4B;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        transition: all 0.2s ease;
+    }
+    .random-box:hover {
+        background-color: #333;
+        border-left-color: #FF8C69;
+    }
+    .random-box .random-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #FF8C69;
+    }
+
     div.stButton > button {
         background-color: #E0434;
         color: white;
@@ -438,10 +459,12 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     if colors_dict:
-        import random
-        st.header("🎲 Random Color")
-        if st.button("Pick a random color"):
-            random_name = random.choice(list(colors_dict.keys()))
-            random_code = colors_dict[random_name]
-            st.markdown(f"**{random_name}** → `{random_code}`")
-            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
+    import random
+    st.markdown('<div class="random-box">', unsafe_allow_html=True)
+    st.markdown('<div class="random-header">🎲 Random Color</div>', unsafe_allow_html=True)
+    if st.button("Pick a random color", use_container_width=True):
+        random_name = random.choice(list(colors_dict.keys()))
+        random_code = colors_dict[random_name]
+        st.markdown(f"**{random_name}** → `{random_code}`")
+        st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
