@@ -458,6 +458,20 @@ with st.sidebar:
     📚 <strong>Data Source:</strong> Combined from various color databases.
     </div>
     """, unsafe_allow_html=True)
+
+    # ─── RANDOM COLOR BOX ─────────────────────────────────
+    st.markdown("""
+    <div class="random-color-box">
+        <div class="random-title">🎲 Random Color</div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("Pick a random color", key="random_btn", use_container_width=True):
+        random_name = random.choice(list(colors_dict.keys()))
+        random_code = colors_dict[random_name]
+        st.markdown(f"**{random_name}** → `{random_code}`")
+        st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
     
     if colors_dict:
         import random
