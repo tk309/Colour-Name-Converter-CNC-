@@ -46,6 +46,28 @@ st.markdown("""
         font-size: 0.9rem;
         margin: 1rem 0;
     }
+    
+    /* ── Random color box ── */
+    .random-color-box {
+        border: 2px solid #FF4B4B;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        background-color: #2a2a2a;
+        transition: all 0.2s ease;
+    }
+    .random-color-box:hover {
+        border-color: #FF8C69;
+        background-color: #333;
+    }
+    .random-color-box .random-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #FF8C69;
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+    
     div.stButton > button {
         background-color: #E0434;
         color: white;
