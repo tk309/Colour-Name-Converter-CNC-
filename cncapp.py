@@ -31,7 +31,7 @@ st.markdown("""
         border: 1px solid #ddd;
     }
     .disclaimer {
-        background-color: #FF7F50;
+        background-color: #728774;
         border-left: 4px solid #DBECDA;
         padding: 0.75rem;
         border-radius: 8px;
@@ -40,7 +40,7 @@ st.markdown("""
     }
     .info-box {
         background-color: #728774;
-        border-left: 4px solid #FFF9C4;
+        border-left: 4px solid #DBECDA;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 0.9rem;
