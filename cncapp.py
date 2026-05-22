@@ -46,14 +46,7 @@ st.markdown("""
         font-size: 0.9rem;
         margin: 1rem 0;
     }
-    /* Box for Random Color section */
-    .random-color-card {
-        border: 1px solid #FF4B4B;
-        border-radius: 10px;
-        padding: 0.8rem;
-        margin-top: 1rem;
-        background-color: #2a2a2a;
-    }
+    
     
     div.stButton > button {
         background-color: #E0434;
