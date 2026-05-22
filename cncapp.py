@@ -60,6 +60,14 @@ st.markdown("""
         background-color: #008000;
         color: white;
     }
+    /* Box for Random Color section */
+    .random-color-box {
+        border: 1px solid #FF4B4B;
+        border-radius: 10px;
+        background-color: #2a2a2a;
+        padding: 0.8rem;
+        margin: 1rem 0;
+    }
 
     /* ── Search engine result cards ── */
     .search-result-card {
@@ -439,9 +447,13 @@ with st.sidebar:
 
     if colors_dict:
         import random
-        st.header("🎲 Random Color")
-        if st.button("Pick a random color"):
-            random_name = random.choice(list(colors_dict.keys()))
-            random_code = colors_dict[random_name]
-            st.markdown(f"**{random_name}** → `{random_code}`")
-            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
+        with st.container():
+            st.markdown('<div class="random-color-box">', unsafe_allow_html=True)
+            st.header("🎲 Random Color")
+        
+            if st.button("Pick a random color"):
+                random_name = random.choice(list(colors_dict.keys()))
+                random_code = colors_dict[random_name]
+                st.markdown(f"**{random_name}** → `{random_code}`")
+                st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
