@@ -45,29 +45,21 @@ st.markdown("""
         border-radius: 8px;
         font-size: 0.9rem;
         margin: 1rem 0;
-    }
-    
-    /* ── Random color box ── */
-    .random-color-box {
-        border: 2px solid #FF4B4B;
-        border-radius: 12px;
-        padding: 1rem;
-        margin-top: 1rem;
-        background-color: #2a2a2a;
-        transition: all 0.2s ease;
-    }
-    .random-color-box:hover {
-        border-color: #FF8C69;
-        background-color: #333;
-    }
-    .random-color-box .random-title {
-        font-size: 1.1rem;
+    }    
+    div.stButton > button {
+        background-color: #E0434;
+        color: white;
         font-weight: bold;
-        color: #FF8C69;
-        margin-bottom: 0.75rem;
-        text-align: center;
+        border-radius: 8px;
+        padding: 0.5rem 2rem;
+        width: 100%;
+        font-size: 1rem;
+        border: none;
     }
-    
+    div.stButton > button:hover {
+        background-color: #008000;
+        color: white;
+    }
 
     /* ── Search engine result cards ── */
     .search-result-card {
@@ -445,18 +437,11 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # ─── RANDOM COLOR BOX ─────────────────────────────────
-    st.markdown("""
-    <div class="random-color-box">
-        <div class="random-title">🎲 Random Color</div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("Pick a random color", key="random_btn", use_container_width=True):
-        random_name = random.choice(list(colors_dict.keys()))
-        random_code = colors_dict[random_name]
-        st.markdown(f"**{random_name}** → `{random_code}`")
-        st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px; margin-top:8px;"></div>', unsafe_allow_html=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    
+    if colors_dict:
+        import random
+        st.header("🎲 Random Color")
+        if st.button("Pick a random color"):
+            random_name = random.choice(list(colors_dict.keys()))
+            random_code = colors_dict[random_name]
+            st.markdown(f"**{random_name}** → `{random_code}`")
+            st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
