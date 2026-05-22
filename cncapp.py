@@ -50,10 +50,11 @@ st.markdown("""
         background-color: #E0434;
         color: white;
         font-weight: bold;
-        border-radius: 8px;
-        padding: 0.5rem 2rem;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
         width: 100%;
-        font-size: 1rem;
+        font-size: 1.1rem;
         border: none;
     }
     div.stButton > button:hover {
