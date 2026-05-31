@@ -1,7 +1,7 @@
-# Project: Color Name Converter (CNC)
+# Project: Colour Name Converter (CNC)
 # Author: Timothy Kemiki
 # Date: 2025/2026
-# Description: A tool to convert hex codes to color names.
+# Description: A tool to convert hex codes to colour names.
 
 import streamlit as st
 import csv
@@ -10,7 +10,7 @@ from pathlib import Path
 from streamlit_searchbox import st_searchbox
 
 st.set_page_config(
-    page_title="Color Name Converter",
+    page_title="Colour Name Converter",
     page_icon="🎨",
     layout="centered"
 )
@@ -132,32 +132,33 @@ document.addEventListener('click', function(e) {
 """, unsafe_allow_html=True)
 
 @st.cache_data
-def load_colors(filename="colors.csv"):
-    colors_dict = {}
+def load_colours(filename="colors.csv"):
+    """Load colours from a CSV file."""
+    colours_dict = {}
     if not Path(filename).exists():
         st.error(f"File '{filename}' not found.")
         return {}
     with open(filename, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
         for row in reader:
-            colors_dict[row["name"]] = row["code"]
-    return colors_dict
+            colours_dict[row["name"]] = row["code"]
+    return colours_dict
 
 def validate_code(code):
     pattern = r"^#[a-fA-F0-9]{6}$"
     return bool(re.search(pattern, code, re.IGNORECASE))
 
-def convert_code(code, colors_dict):
+def convert_code(code, colours_dict):
     code = code.upper()
-    return [name for name, hex_code in colors_dict.items() if hex_code == code] or None
+    return [name for name, hex_code in colours_dict.items() if hex_code == code] or None
 
 def validate_name(name):
     pattern = r"^[a-zA-Z\s'']+$"
     return bool(re.fullmatch(pattern, name, re.IGNORECASE))
 
-def convert_name(name, colors_dict):
+def convert_name(name, colours_dict):
     name = name.title().replace("'", "'")
-    return colors_dict.get(name)
+    return colours_dict.get(name)
 
 # ── SEARCH ENGINE HELPERS ────────────────────────────────────────────────────
 
@@ -174,20 +175,20 @@ def hex_to_rgb(hex_code):
     except ValueError:
         return None
 
-def color_distance(hex1, hex2):
-    """Euclidean distance between two hex colors in RGB space.
+def colour_distance(hex1, hex2):
+    """Euclidean distance between two hex colours in RGB space.
     Returns a very large number if either hex code is invalid."""
     rgb1 = hex_to_rgb(hex1)
     rgb2 = hex_to_rgb(hex2)
     if rgb1 is None or rgb2 is None:
-        return float('inf')   # push invalid colors to the end of sorted list
+        return float('inf')   # push invalid colours to the end of sorted list
     r1, g1, b1 = rgb1
     r2, g2, b2 = rgb2
     return ((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2) ** 0.5
     
-def search_color_names(query, colors_dict, max_results=8):
+def search_colour_names(query, colours_dict, max_results=8):
     """
-    Search engine for color names.
+    Search engine for colour names.
     Priority: exact match → starts with query → word starts with query → contains query.
     Returns a list of (name, hex_code, match_type) tuples.
     """
@@ -197,7 +198,7 @@ def search_color_names(query, colors_dict, max_results=8):
 
     exact, starts, word_starts, contains = [], [], [], []
 
-    for name, code in colors_dict.items():
+    for name, code in colours_dict.items():
         name_lower = name.lower()
         words = name_lower.split()
         if name_lower == q:
@@ -214,7 +215,7 @@ def search_color_names(query, colors_dict, max_results=8):
 
     return (exact + starts + word_starts + contains)[:max_results]
 
-def search_hex_codes(query, colors_dict, max_results=8):
+def search_hex_codes(query, colours_dict, max_results=8):
     """
     Search engine for hex codes.
     Priority: exact match → prefix match → closest by RGB distance.
@@ -233,17 +234,17 @@ def search_hex_codes(query, colors_dict, max_results=8):
     results = []
     
     if is_complete_hex:
-        # EXACT MATCH ONLY - find the color name(s) for this exact hex
-        exact_names = convert_code(q, colors_dict)
+        # EXACT MATCH ONLY - find the colour name(s) for this exact hex
+        exact_names = convert_code(q, colours_dict)
         if exact_names:
             for name in exact_names[:max_results]:
                 results.append(f"{q} - {name}")
-        # Return ONLY the exact match(es) - no prefix matches, no closest colors
+        # Return ONLY the exact match(es) - no prefix matches, no closest colours
         return results
         
     # Prefix matches (user is typing partial hex)
     prefix_matches = []
-    for name, code in colors_dict.items():
+    for name, code in colours_dict.items():
         code_upper = code.upper()
         if code_upper.startswith(q):
             prefix_matches.append((name, code))
@@ -264,7 +265,7 @@ def render_result_cards(results):
         "word_match":  ("🔤 Word match",     "#1a2a3a", "#42A5F5"),
         "contains":    ("🔍 Contains",       "#2a2a1a", "#FFC107"),
         "prefix":      ("🔢 Prefix match",   "#1a2a3a", "#42A5F5"),
-        "closest":     ("🎯 Closest color",  "#2a1a1a", "#FF7043"),
+        "closest":     ("🎯 Closest colour",  "#2a1a1a", "#FF7043"),
     }
 
     for name, code, match_type in results:
@@ -288,39 +289,39 @@ def render_result_cards(results):
 
 # ─────────────────────────────────────────────────────────────────────────────
 
-colors_dict = load_colors()
-if not colors_dict:
+colours_dict = load_colours()
+if not colours_dict:
     st.stop()
 
-st.markdown('<h1 class="main-header">🎨 Color Name Converter</h1>', unsafe_allow_html=True)
-st.markdown("Convert between color names and their hexadecimal codes.")
+st.markdown('<h1 class="main-header">🎨 Colour Name Converter</h1>', unsafe_allow_html=True)
+st.markdown("Convert between colour names and their hexadecimal codes.")
 
 st.markdown("""
 <div class="disclaimer">
-📌 <strong>NOTE:</strong> This tool uses a limited color database. Some color names or hex codes may not be available.
+📌 <strong>NOTE:</strong> This tool uses a limited colour database. Some colour names or hex codes may not be available.
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["🔍 Color Name → Hex Code", "🔢 Hex Code → Color Name"])
+tab1, tab2 = st.tabs(["🔍 Colour Name → Hex Code", "🔢 Hex Code → Colour Name"])
 
 
 
-def search_colors(query: str, **kwargs) -> list:
-    """Return color names that start with the query."""
+def search_colours(query: str, **kwargs) -> list:
+    """Return colour names that start with the query."""
     if not query or len(query.strip()) == 0:
         return []  # No dropdown until user types
     query_lower = query.strip().lower()
     matches = [
-        name for name in sorted(colors_dict.keys())
+        name for name in sorted(colours_dict.keys())
         if name.lower().startswith(query_lower)
     ]
     return matches[:50]  # Limit results
 
 with tab1:
-    st.subheader("Enter a color name")
+    st.subheader("Enter a colour name")
     
     selected_name = st_searchbox(
-        search_function=search_colors,
+        search_function=search_colours,
         placeholder="Type a letter (e.g., R, B, G)...",
         key="color_searchbox",
         clearable=True,
@@ -328,7 +329,7 @@ with tab1:
     )
     
     if selected_name:
-        results = search_color_names(selected_name, colors_dict, max_results=8)
+        results = search_colour_names(selected_name, colours_dict, max_results=8)
         if results:
             st.markdown(
                 f'<div class="search-stats">🔎 {len(results)} result(s) for "<strong>{selected_name}</strong>"</div>',
@@ -336,12 +337,12 @@ with tab1:
             )
             render_result_cards(results)
             
-# ========= TAB 2: Hex to Color Name =========
+# ========= TAB 2: Hex to Colour Name =========
 
 def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
     """
     Search function for hex codes.
-    Returns formatted strings that look like "HexCode - ColorName"
+    Returns formatted strings that look like "HexCode - ColourName"
     Dropdown appears only after typing.
     """
     if not query or len(query.strip()) == 0:
@@ -355,7 +356,7 @@ def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
     
     # 1. Prefix matches (user is typing partial hex)
     prefix_matches = []
-    for name, code in colors_dict.items():
+    for name, code in colours_dict.items():
         code_upper = code.upper()
         if code_upper.startswith(query):
             prefix_matches.append((name, code))
@@ -371,7 +372,7 @@ def search_hex_codes_autocomplete(query: str, **kwargs) -> list:
     
 
 with tab2:
-    st.subheader("Enter a hex color code")
+    st.subheader("Enter a hex colour code")
     
     selected_hex_result = st_searchbox(
         search_function=search_hex_codes_autocomplete,
@@ -383,28 +384,28 @@ with tab2:
     
     # Parse the selection (format: "#FF0000 - Red")
     if selected_hex_result:
-        # Extract hex code and color name from the formatted string
+        # Extract hex code and colour name from the formatted string
         if " - " in selected_hex_result:
-            hex_code, color_name = selected_hex_result.split(" - ", 1)
+            hex_code, colour_name = selected_hex_result.split(" - ", 1)
         else:
             hex_code = selected_hex_result
-            color_name = None
+            colour_name = None
         
-        # Display the selected color details
+        # Display the selected colour details
         if hex_code and validate_code(hex_code):
-            # Find matching color names
-            matching_names = convert_code(hex_code, colors_dict)
+            # Find matching colour names
+            matching_names = convert_code(hex_code, colours_dict)
             
             if matching_names:
                 # Show results as cards
                 results_to_show = [(name, hex_code, "exact") for name in matching_names]
                 render_result_cards(results_to_show)
-            elif color_name:
+            elif colour_name:
                 # If we have the name from the selection
-                results_to_show = [(color_name, hex_code, "exact")]
+                results_to_show = [(colour_name, hex_code, "exact")]
                 render_result_cards(results_to_show)
             else:
-                # No exact match found, show closest colors
+                # No exact match found, show closest colours
                 st.markdown(
                     f'<div class="no-exact-banner">⚠️ No exact match for <strong>{hex_code}</strong>. '
                     f'But you selected it from suggestions!</div>',
@@ -418,12 +419,12 @@ with tab2:
 with st.sidebar:
     st.header("ℹ️ ABOUT")
     st.markdown("""
-    This app converts between **color names** and **hexadecimal codes** using a database of over 1000 colors.
+    This app converts between **colour names** and **hexadecimal codes** using a database of over 1000 colours.
     
     **Features:**
     - Case‑insensitive input
     - Supports multiple names for the same hex code
-    - Real‑time color preview
+    - Real‑time colour preview
     - RGB values shown
     
     **Examples:**
@@ -433,15 +434,15 @@ with st.sidebar:
     """)
     st.markdown("""
     <div class="info-box">
-    📚 <strong>Data Source:</strong> Combined from various color databases.
+    📚 <strong>Data Source:</strong> Combined from various colour databases.
     </div>
     """, unsafe_allow_html=True)
 
-    if colors_dict:
+    if colours_dict:
         import random
-        st.header("🎲 Random Color")
-        if st.button("Pick a random color"):
-            random_name = random.choice(list(colors_dict.keys()))
-            random_code = colors_dict[random_name]
+        st.header("🎲 Random Colour")
+        if st.button("Pick a random colour"):
+            random_name = random.choice(list(colours_dict.keys()))
+            random_code = colours_dict[random_name]
             st.markdown(f"**{random_name}** → `{random_code}`")
             st.markdown(f'<div style="background-color:{random_code}; height:50px; border-radius:5px;"></div>', unsafe_allow_html=True)
