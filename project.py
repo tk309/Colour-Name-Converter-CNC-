@@ -1,59 +1,65 @@
+# Project: Colour Name Converter (CNC)
+# Author: Timothy Kemiki
+# Date: 2024/2025
+# Description: A code that convert colour names to hex codes.
+
+
 import csv
 import re
 
 
 
-def load_colors(filename):
-    # Empty Dict to store color names and code
-    colors_dict = {}
+def load_colours(filename):
+    # Empty Dict to store colour names and code
+    colours_dict = {}
     # Open 'filename' in read-mode(r)
     with open(filename, mode="r") as file:
         # Read each row in CSV file as a dictionary
         reader = csv.DictReader(file)
         # Iterate through the rows
         for row in reader:
-            # Add name and code as key-value pairs to empty dict 'colors_dict'
-            colors_dict[row["name"]] = row["code"]
-    # Return 'colors_dict' now containing key-value pairs of names and code of each color
-    return colors_dict
+            # Add name and code as key-value pairs to empty dict 'colours_dict'
+            colours_dict[row["name"]] = row["code"]
+    # Return 'colours_dict' now containing key-value pairs of names and code of each colour
+    return colours_dict
 
     
 def main():
     # Pass CSV file as input to load function
-    colors_dict = load_colors("colors.csv")
+    colours_dict = load_colours("colors.csv")
     # Get input from user
-    color = input("Color: ").strip()
-    # If user inputs color code
-    if color.startswith("#"):
+    colour = input("Colour: ").strip()
+    # If user inputs colour code
+    if colour.startswith("#"):
         # Convert user's input to uppercase
-        color = color.upper()
+        colour = colour.upper()
         # If return value is True
-        if validate_code(color):
-             cc = convert_code(color, colors_dict)
+        if validate_code(colour):
+             cc = convert_code(colour, colours_dict)
              if cc:
                  # Handles where multiple keys have same value
-                 print("Color Name:", ", ".join(cc))
+                 print("Colour Name:", ", ".join(cc))
              else:
-                 print("Color code not found")
+                 print("Colour code not found")
         # If return value is False
         else:
-            print("Invalid color code")
-    # If user inputs color name
+            print("Invalid colour code")
+    # If user inputs colour name
     else:
         # Convert input to title case
-        color = color.title()
+        colour = colour.title()
         # Replace "’" with "'"
-        color = color.replace("’", "'")
+        colour = colour.replace("’", "'")
         # If return value is True
-        if validate_name(color):
-             cn = convert_name(color, colors_dict)
+        if validate_name(colour):
+             cn = convert_name(colour, colours_dict)
              if cn:
-                 print("Color Code:", cn)
+                 print("Colour Code:", cn)
              else:
-                 print("Color name not found")
+                 print("Colour name not found")
         # If return value is False
         else:
-            print("Invalid color name")
+            print("Invalid colour name")
 
 
 # Validate user's code input
@@ -66,23 +72,23 @@ def validate_code(valid):
     else:
         return False
 
-# Convert color code to color name
-def convert_code(code, colors_dict):
+# Convert colour code to colour name
+def convert_code(code, colours_dict):
     # Create an Empty list
     names = []
     # Iterate through the dictionary items(both keys and values)
-    for name, hex_code in colors_dict.items():
-        # Check if the value matches the input color code.
+    for name, hex_code in colours_dict.items():
+        # Check if the value matches the input colour code.
         if hex_code == code:
             names.append(name)
     if names:
-        # Return names[] with matching color names
+        # Return names[] with matching colour names
         return names
     # If no matches found in names[]
     return None
 
 
-# Validate user's color name
+# Validate user's colour name
 def validate_name(valid):
     pattern = r"[a-zA-Z\s'’]+"
     # match only when the entire input is a string of letters
@@ -92,11 +98,11 @@ def validate_name(valid):
     else:
         return False
 
-# Convert color name to color code
-def convert_name(name, colors_dict):
-    if name in colors_dict:
-        return colors_dict[name]
-    # If color name is not in the dictionary
+# Convert colour name to colour code
+def convert_name(name, colours_dict):
+    if name in colours_dict:
+        return colours_dict[name]
+    # If colour name is not in the dictionary
     return None
 
 
