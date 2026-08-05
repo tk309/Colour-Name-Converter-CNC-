@@ -20,7 +20,7 @@ st.markdown("""
     .main-header {
         font-size: 2.5rem;
         text-align: center;
-        color: #FF4B4B;
+        color: #FFFFFF;
         margin-bottom: 1rem;
     }
     .color-preview {
