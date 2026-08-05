@@ -7,7 +7,7 @@ import streamlit as st
 import csv
 import re
 from pathlib import Path
-from streamlit-searchbox import st_searchbox
+from streamlit_searchbox import st_searchbox
 
 st.set_page_config(
     page_title="Colour Name Converter",
